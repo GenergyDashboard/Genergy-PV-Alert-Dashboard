@@ -245,8 +245,8 @@
                 // Scale irradiation so it visually sits below PV bars
                 const maxPv=Math.max(...pv,...(stats.hourly_avg||[0]),1);
                 const maxIr=Math.max(...ir,1);
-                // irrad peak should appear at ~70% of PV axis height
-                const y1Max=maxIr*(maxPv/(maxIr*0.7))||maxIr*2;
+                // irrad peak should appear at ~70% of chart height
+                const y1Max=maxIr/0.7;
 
                 siteCharts[cid]=new Chart(ctx,{type:'bar',data:{labels:hrs,datasets:[
                     {type:'line',label:'Irrad',data:ir,backgroundColor:'rgba(133,77,14,0.5)',borderColor:'rgba(202,138,4,0.7)',borderWidth:0.5,fill:true,yAxisID:'y1',pointRadius:0,tension:0.4,order:3},
