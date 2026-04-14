@@ -3,150 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genergy - PV Fleet Dashboard</title>
+    <title>Genergy — PV Fleet Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0f1419;
-            color: #e2e8f0;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container { max-width: 1400px; margin: 0 auto; }
-
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f1419; color: #e2e8f0; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1800px; margin: 0 auto; }
         .header { text-align: center; margin-bottom: 25px; }
         .header h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; font-weight: 500; }
         .last-updated { color: #64748b; font-size: 0.85rem; }
-
-        /* ── Fleet Summary ─────────────────────────────── */
-        .fleet-summary {
-            background: linear-gradient(135deg, #1a2332 0%, #1e2936 100%);
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            text-align: center;
-        }
-        .fleet-total {
-            font-size: 4rem; font-weight: 700; margin-bottom: 5px;
-            color: #fff; line-height: 1;
-        }
+        .fleet-summary { background: linear-gradient(135deg, #1a2332 0%, #1e2936 100%); border-radius: 16px; padding: 30px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); text-align: center; }
+        .fleet-total { font-size: 4rem; font-weight: 700; margin-bottom: 5px; color: #fff; line-height: 1; }
         .fleet-label { color: #9ca3af; font-size: 0.85rem; margin-bottom: 20px; }
-        .fleet-status-bar {
-            background: rgba(10, 15, 26, 0.6); border-radius: 10px;
-            padding: 12px 20px; display: flex; justify-content: space-between;
-            align-items: center; flex-wrap: wrap; gap: 10px;
-        }
+        .fleet-status-bar { background: rgba(10,15,26,0.6); border-radius: 10px; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .fleet-status-label { color: #9ca3af; font-size: 0.85rem; }
         .fleet-status-badges { display: flex; gap: 10px; flex-wrap: wrap; }
-        .fleet-status-badge {
-            display: flex; align-items: center; gap: 8px;
-            padding: 5px 14px; border-radius: 16px;
-            background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-        .fleet-status-badge.warn { background: rgba(251, 146, 60, 0.15); border-color: rgba(251, 146, 60, 0.3); }
-        .fleet-status-badge.error { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); }
+        .fleet-status-badge { display: flex; align-items: center; gap: 8px; padding: 5px 14px; border-radius: 16px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); }
+        .fleet-status-badge.warn { background: rgba(251,146,60,0.15); border-color: rgba(251,146,60,0.3); }
+        .fleet-status-badge.error { background: rgba(107,114,128,0.15); border-color: rgba(107,114,128,0.3); }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; }
         .warn .status-dot { background: #fb923c; box-shadow: 0 0 8px #fb923c; }
-        .error .status-dot { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+        .error .status-dot { background: #6b7280; box-shadow: 0 0 8px #6b7280; }
         .status-count { font-weight: 700; font-size: 0.85rem; }
         .fleet-status-badge .status-count { color: #22c55e; }
         .warn .status-count { color: #fb923c; }
-        .error .status-count { color: #ef4444; }
-
-        /* ── Filter bar ────────────────────────────────── */
-        .filter-bar {
-            display: flex; justify-content: center; gap: 8px;
-            margin-bottom: 18px; flex-wrap: wrap;
-        }
-        .filter-btn {
-            padding: 7px 18px; border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(15, 20, 25, 0.4); color: #9ca3af;
-            cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.25s;
-        }
-        .filter-btn:hover { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; color: #60a5fa; }
-        .filter-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
-
-        /* ── Chart mode toggle ─────────────────────────── */
-        .chart-mode-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 18px; }
-        .mode-btn {
-            padding: 7px 18px; border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(15, 20, 25, 0.4); color: #9ca3af;
-            cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.25s;
-        }
-        .mode-btn:hover { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; color: #60a5fa; }
-        .mode-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
-
-        /* ── Site cards ────────────────────────────────── */
-        .sites-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 18px; margin-bottom: 30px;
-        }
-        .site-card {
-            background: linear-gradient(135deg, #1a2332 0%, #1e2936 100%);
-            border-radius: 14px; padding: 0;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); transition: all 0.3s;
-            cursor: pointer; border: 2px solid rgba(255, 255, 255, 0.1); overflow: hidden;
-        }
-        .site-card:hover {
-            transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-            border-color: rgba(255, 255, 255, 0.25);
-        }
+        .error .status-count { color: #6b7280; }
+        .controls-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+        .ctrl-btn { padding: 7px 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15,20,25,0.4); color: #9ca3af; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.25s; }
+        .ctrl-btn:hover { background: rgba(59,130,246,0.2); border-color: #3b82f6; color: #60a5fa; }
+        .ctrl-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+        .sites-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 14px; margin-bottom: 30px; }
+        .site-card { background: linear-gradient(135deg, #1a2332 0%, #1e2936 100%); border-radius: 14px; padding: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.3s; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); overflow: hidden; display: flex; flex-direction: column; }
+        .site-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.25); }
         .site-card.hidden { display: none; }
-        .site-info { padding: 16px 20px 8px; display: flex; justify-content: space-between; align-items: flex-start; }
-        .site-left { display: flex; flex-direction: column; }
-        .site-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-        .site-name { font-size: 0.95rem; font-weight: 500; color: #fff; }
-        .site-platform {
-            font-size: 0.6rem; font-weight: 600; padding: 2px 6px; border-radius: 3px;
-            text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .site-platform.fusionsolar { background: rgba(234, 88, 12, 0.2); color: #fb923c; }
-        .site-platform.goodwe { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
-        .site-platform.sunsynk { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
-        .status-indicator { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
+        /* Single-row header: name · dot · platform · kWh · status | badges right */
+        .site-topbar { padding: 12px 16px 4px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .site-topbar-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: wrap; }
+        .site-name { font-size: 1.05rem; font-weight: 700; color: #fff; white-space: nowrap; }
+        .status-indicator { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 8px currentColor; flex-shrink: 0; }
         .status-indicator.ok { background: #22c55e; color: #22c55e; }
         .status-indicator.low { background: #fb923c; color: #fb923c; }
-        .status-indicator.offline { background: #ef4444; color: #ef4444; }
-        .site-production { font-size: 1.8rem; font-weight: 700; line-height: 1; color: #fff; margin-bottom: 4px; }
-        .site-status { font-size: 0.75rem; font-weight: 600; }
-        .site-status.ok { color: #22c55e; }
-        .site-status.low { color: #fb923c; }
-        .site-status.offline { color: #ef4444; }
-        .site-stat-badge {
-            font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border-radius: 4px;
-            background: rgba(255, 255, 255, 0.06); color: #9ca3af;
-        }
+        .status-indicator.offline { background: #6b7280; color: #6b7280; }
+        .site-platform { font-size: 0.6rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+        .site-platform.fusionsolar { background: rgba(234,88,12,0.25); color: #fb923c; }
+        .site-platform.goodwe { background: rgba(34,197,94,0.25); color: #22c55e; }
+        .site-platform.sunsynk { background: rgba(96,165,250,0.25); color: #60a5fa; }
+        .site-kwh { font-size: 1.05rem; font-weight: 700; color: #fff; white-space: nowrap; }
+        .site-kwh span { font-size: 0.75rem; color: #9ca3af; }
+        .site-status-label { font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+        .site-status-label.ok { color: #22c55e; }
+        .site-status-label.low { color: #fb923c; }
+        .site-status-label.offline { color: #6b7280; }
+        .site-badges { display: flex; flex-direction: column; gap: 3px; align-items: flex-end; flex-shrink: 0; }
+        .site-stat-badge { font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.06); color: #9ca3af; white-space: nowrap; }
         .site-stat-badge.good { color: #22c55e; }
         .site-stat-badge.warn { color: #fb923c; }
         .site-stat-badge.bad { color: #ef4444; }
-
-        .mini-legend { display: flex; gap: 8px; padding: 2px 14px 4px; flex-wrap: wrap; }
-        .mini-legend-item { display: flex; align-items: center; gap: 3px; font-size: 0.65rem; color: #6b7280; }
-        .mini-legend-swatch { width: 14px; height: 4px; border-radius: 1px; }
-
-        .site-chart-wrapper { width: 100%; height: 140px; position: relative; padding: 0 12px 12px; }
-        .site-chart-container { position: absolute; top: 0; left: 12px; right: 12px; bottom: 12px; }
-
-        .refresh-btn {
-            position: fixed; bottom: 30px; right: 30px; padding: 12px 22px; border-radius: 25px;
-            border: none; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: #fff; cursor: pointer; font-size: 0.85rem; font-weight: 600;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); transition: all 0.3s; z-index: 50;
-        }
-        .refresh-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6); }
-
+        .site-stat-badge.irrad { color: #ca8a04; font-size: 0.65rem; }
+        /* Chart fills remaining space */
+        .site-chart-wrapper { flex: 1; min-height: 200px; position: relative; padding: 4px 8px 8px; }
+        .site-chart-container { position: absolute; top: 0; left: 8px; right: 8px; bottom: 8px; }
+        .refresh-btn { position: fixed; bottom: 30px; right: 30px; padding: 12px 22px; border-radius: 25px; border: none; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #fff; cursor: pointer; font-size: 0.85rem; font-weight: 600; box-shadow: 0 4px 15px rgba(59,130,246,0.4); transition: all 0.3s; z-index: 50; }
+        .refresh-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59,130,246,0.6); }
         .loading { text-align: center; padding: 60px; font-size: 1.2rem; color: #94a3b8; }
         .footer-note { text-align: left; color: #64748b; font-size: 0.75rem; margin-top: 15px; padding-left: 5px; }
-
-        @media (max-width: 1100px) { .sites-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 700px) { .sites-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 500px) { .sites-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -155,434 +76,211 @@
             <h1>Genergy — PV Fleet Dashboard</h1>
             <div class="last-updated" id="lastUpdated">Loading...</div>
         </div>
-
         <div class="fleet-summary">
-            <div class="fleet-total" id="fleetTotal">0.0 <span style="font-size: 1.5rem; color: #9ca3af;">kWh</span></div>
+            <div class="fleet-total" id="fleetTotal">0.0 <span style="font-size:1.5rem;color:#9ca3af">kWh</span></div>
             <div class="fleet-label">Total Fleet Generation Today</div>
             <div class="fleet-status-bar">
                 <div class="fleet-status-label">Fleet Status</div>
                 <div class="fleet-status-badges" id="statusBadges"></div>
             </div>
         </div>
-
-        <div class="filter-bar">
-            <button class="filter-btn active" onclick="filterPlatform('all', this)">All Sites</button>
-            <button class="filter-btn" onclick="filterPlatform('fusionsolar', this)">FusionSolar</button>
-            <button class="filter-btn" onclick="filterPlatform('goodwe', this)">GoodWe</button>
-            <button class="filter-btn" onclick="filterPlatform('sunsynk', this)">Sunsynk</button>
+        <div class="controls-row" id="filterRow">
+            <button class="ctrl-btn active" onclick="filterPlatform('all', this)">All Sites</button>
+            <button class="ctrl-btn" onclick="filterPlatform('fusionsolar', this)">FusionSolar</button>
+            <button class="ctrl-btn" onclick="filterPlatform('goodwe', this)">GoodWe</button>
+            <button class="ctrl-btn" onclick="filterPlatform('sunsynk', this)">Sunsynk</button>
         </div>
-
-        <div class="chart-mode-bar">
-            <button class="mode-btn active" onclick="switchMiniMode('today', this)">Today</button>
-            <button class="mode-btn" onclick="switchMiniMode('average', this)">30-Day Average</button>
+        <div class="controls-row" id="modeRow">
+            <button class="ctrl-btn active" onclick="switchMiniMode('today', this)">Today</button>
+            <button class="ctrl-btn" onclick="switchMiniMode('average', this)">30-Day Average</button>
         </div>
-
-        <div id="sitesContainer" class="sites-grid">
-            <div class="loading">Loading site data...</div>
-        </div>
-
-        <div class="footer-note">Auto-refreshes every hour · Data sourced from FusionSolar, GoodWe SEMS+, and Sunsynk portals</div>
+        <div id="sitesContainer" class="sites-grid"><div class="loading">Loading site data...</div></div>
+        <div class="footer-note">Auto-refreshes every hour · Scrapers run 05:00–21:00 SAST</div>
         <button class="refresh-btn" onclick="loadAllSites()">&#x1f504; Refresh</button>
     </div>
-
     <script>
-        // =================================================================
-        // SITE REGISTRY — all sites across all platforms
-        // =================================================================
         const BASE = "https://genergydashboard.github.io";
-
         const ALL_SITES = [
-            // ── FusionSolar (consolidated repo) ─────────────────────
-            {
-                name: "Bel Essex (Valeo)",
-                platform: "fusionsolar",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bel-essex-valeo/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bel-essex-valeo/`,
-            },
-            {
-                name: "BMI Park",
-                platform: "fusionsolar",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-park/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-park/`,
-            },
-            {
-                name: "BMI Paterson",
-                platform: "fusionsolar",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-paterson/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-paterson/`,
-            },
-            {
-                name: "Coega Dairy",
-                platform: "fusionsolar",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/coega-dairy/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/coega-dairy/`,
-            },
-            {
-                name: "Keypak Part 2",
-                platform: "fusionsolar",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/keypak-part-2/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/keypak-part-2/`,
-            },
-            {
-                name: "MP The Pines",
-                platform: "fusionsolar",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mp-the-pines/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mp-the-pines/`,
-            },
-            {
-                name: "Mountain View SC",
-                platform: "fusionsolar",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mountain-view-sc/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mountain-view-sc/`,
-            },
-            {
-                name: "RDM Somerset West 5MW",
-                platform: "fusionsolar",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/rdm-somerset-west/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/rdm-somerset-west/`,
-            },
-            {
-                name: "WG Nurture Health",
-                platform: "fusionsolar",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-nurture-health/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-nurture-health/`,
-            },
-            {
-                name: "Shoprite Parklands",
-                platform: "fusionsolar",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/shoprite-parklands/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/shoprite-parklands/`,
-            },
-            {
-                name: "WG Mdantsane SuperSpar",
-                platform: "fusionsolar",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-mdantsane-superspar/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-mdantsane-superspar/`,
-            },
-
-            // ── GoodWe (multi-site repo) ────────────────────────────
-            {
-                name: "Aurora",
-                platform: "goodwe",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/aurora/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/aurora/`,
-            },
-            {
-                name: "BMI Isuzu",
-                platform: "goodwe",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/bmi-isuzu/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/bmi-isuzu/`,
-            },
-            {
-                name: "WG Bloomingdales",
-                platform: "goodwe",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-bloomingdales/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-bloomingdales/`,
-            },
-            {
-                name: "WG Circular Business Park",
-                platform: "goodwe",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-circular-business-park/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-circular-business-park/`,
-            },
-            {
-                name: "WG Cure Day Hospital",
-                platform: "goodwe",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-cure-day-hospital/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-cure-day-hospital/`,
-            },
-            {
-                name: "WG Debi Lee Spar",
-                platform: "goodwe",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-debi-lee-spar/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-debi-lee-spar/`,
-            },
-            {
-                name: "WG Gonubie Mall",
-                platform: "goodwe",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-gonubie-mall/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-gonubie-mall/`,
-            },
-            {
-                name: "WG Heritage Mall",
-                platform: "goodwe",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-heritage-mall/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-heritage-mall/`,
-            },
-            {
-                name: "WG Wellington Square",
-                platform: "goodwe",
-                dataUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-wellington-square/data/processed.json`,
-                dashboardUrl: `${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-wellington-square/`,
-            },
-
-            // ── Sunsynk / Kirkwood (multi-site repo) ────────────────
-            {
-                name: "Addo Spar",
-                platform: "sunsynk",
-                dataUrl: `${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/addo-spar/data/processed.json`,
-                dashboardUrl: `${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/addo-spar/`,
-            },
-            {
-                name: "Kirkwood FNB",
-                platform: "sunsynk",
-                dataUrl: `${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-fnb/data/processed.json`,
-                dashboardUrl: `${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-fnb/`,
-            },
-            {
-                name: "Kirkwood Spar",
-                platform: "sunsynk",
-                dataUrl: `${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-spar/data/processed.json`,
-                dashboardUrl: `${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-spar/`,
-            },
-            {
-                name: "Kirkwood Tops",
-                platform: "sunsynk",
-                dataUrl: `${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-tops/data/processed.json`,
-                dashboardUrl: `${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-tops/`,
-            },
+            { name:"Bel Essex (Valeo)", platform:"fusionsolar", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bel-essex-valeo/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bel-essex-valeo/` },
+            { name:"BMI Park", platform:"fusionsolar", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-park/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-park/` },
+            { name:"BMI Paterson", platform:"fusionsolar", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-paterson/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-paterson/` },
+            { name:"Coega Dairy", platform:"fusionsolar", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/coega-dairy/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/coega-dairy/` },
+            { name:"Keypak Part 2", platform:"fusionsolar", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/keypak-part-2/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/keypak-part-2/` },
+            { name:"MP The Pines", platform:"fusionsolar", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mp-the-pines/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mp-the-pines/` },
+            { name:"Mountain View SC", platform:"fusionsolar", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mountain-view-sc/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mountain-view-sc/` },
+            { name:"RDM Somerset West 5MW", platform:"fusionsolar", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/rdm-somerset-west/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/rdm-somerset-west/` },
+            { name:"WG Nurture Health", platform:"fusionsolar", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-nurture-health/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-nurture-health/` },
+            { name:"Shoprite Parklands", platform:"fusionsolar", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/shoprite-parklands/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/shoprite-parklands/` },
+            { name:"WG Mdantsane SuperSpar", platform:"fusionsolar", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-mdantsane-superspar/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-mdantsane-superspar/` },
+            { name:"Aurora", platform:"goodwe", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/aurora/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/aurora/` },
+            { name:"BMI Isuzu", platform:"goodwe", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/bmi-isuzu/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/bmi-isuzu/` },
+            { name:"WG Bloomingdales", platform:"goodwe", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-bloomingdales/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-bloomingdales/` },
+            { name:"WG Circular Business Park", platform:"goodwe", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-circular-business-park/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-circular-business-park/` },
+            { name:"WG Cure Day Hospital", platform:"goodwe", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-cure-day-hospital/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-cure-day-hospital/` },
+            { name:"WG Debi Lee Spar", platform:"goodwe", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-debi-lee-spar/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-debi-lee-spar/` },
+            { name:"WG Gonubie Mall", platform:"goodwe", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-gonubie-mall/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-gonubie-mall/` },
+            { name:"WG Heritage Mall", platform:"goodwe", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-heritage-mall/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-heritage-mall/` },
+            { name:"WG Wellington Square", platform:"goodwe", dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-wellington-square/data/processed.json`, dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-wellington-square/` },
+            { name:"Addo Spar", platform:"sunsynk", dataUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/addo-spar/data/processed.json`, dashboardUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/addo-spar/` },
+            { name:"Kirkwood FNB", platform:"sunsynk", dataUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-fnb/data/processed.json`, dashboardUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-fnb/` },
+            { name:"Kirkwood Spar", platform:"sunsynk", dataUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-spar/data/processed.json`, dashboardUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-spar/` },
+            { name:"Kirkwood Tops", platform:"sunsynk", dataUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-tops/data/processed.json`, dashboardUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-tops/` },
         ];
 
-        // =================================================================
-        // STATE
-        // =================================================================
-        let allSitesData = [];
-        let siteCharts = {};
-        let currentMiniMode = 'today';
-        let currentFilter = 'all';
-
+        let allSitesData = [], siteCharts = {}, currentMiniMode = 'today', currentFilter = 'all';
         Chart.defaults.devicePixelRatio = window.devicePixelRatio * 2 || 2;
-
         loadAllSites();
         setInterval(loadAllSites, 3600000);
 
-        // =================================================================
-        // DATA LOADING
-        // =================================================================
         async function loadAllSites() {
-            try {
-                const promises = ALL_SITES.map(async site => {
-                    try {
-                        const response = await fetch(site.dataUrl);
-                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                        const data = await response.json();
-                        return { ...site, ...data, loaded: true };
-                    } catch (error) {
-                        console.warn(`⚠️ ${site.name}: ${error.message}`);
-                        return {
-                            ...site,
-                            loaded: false,
-                            status: 'offline',
-                            total_kwh: 0,
-                            last_updated: null,
-                            today: { hourly_pv: new Array(24).fill(0), irradiation: new Array(24).fill(0) },
-                            hourly_pv: new Array(24).fill(0),
-                            stats_30day: {}
-                        };
-                    }
-                });
-
-                allSitesData = await Promise.all(promises);
-                // Sort: issues first, then by production desc
-                allSitesData.sort((a, b) => {
-                    const statusOrder = { offline: 0, low: 1, ok: 2 };
-                    const sa = statusOrder[a.status] ?? 2;
-                    const sb = statusOrder[b.status] ?? 2;
-                    if (sa !== sb) return sa - sb;
-                    return (b.total_kwh || 0) - (a.total_kwh || 0);
-                });
-                updateDashboard();
-            } catch (error) {
-                console.error('Error loading sites:', error);
-            }
+            const promises = ALL_SITES.map(async site => {
+                try {
+                    const r = await fetch(site.dataUrl);
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return { ...site, ...(await r.json()), loaded: true };
+                } catch (e) {
+                    return { ...site, loaded:false, status:'offline', total_kwh:0, last_updated:null,
+                        today:{hourly_pv:new Array(24).fill(0),irradiation:new Array(24).fill(0)},
+                        hourly_pv:new Array(24).fill(0), stats_30day:{} };
+                }
+            });
+            allSitesData = await Promise.all(promises);
+            allSitesData.sort((a,b) => {
+                const o={offline:0,low:1,ok:2}, d=(o[a.status]??2)-(o[b.status]??2);
+                return d!==0?d:(b.total_kwh||0)-(a.total_kwh||0);
+            });
+            updateDashboard();
         }
 
-        function getHourlyPv(site) {
-            return (site.today && site.today.hourly_pv) || site.hourly_pv || new Array(24).fill(0);
-        }
+        function getPv(s){return(s.today&&s.today.hourly_pv)||s.hourly_pv||new Array(24).fill(0)}
+        function getIr(s){return(s.today&&s.today.irradiation)||s.irradiation||new Array(24).fill(0)}
 
-        // =================================================================
-        // DASHBOARD UPDATE
-        // =================================================================
-        function updateDashboard() {
-            const fleetTotal = allSitesData.reduce((sum, s) => sum + (s.total_kwh || 0), 0);
-            const okCount = allSitesData.filter(s => s.status === 'ok').length;
-            const lowCount = allSitesData.filter(s => s.status === 'low').length;
-            const offlineCount = allSitesData.filter(s => s.status === 'offline').length;
-
-            document.getElementById('fleetTotal').innerHTML =
-                `${fleetTotal.toFixed(1)} <span style="font-size: 1.5rem; color: #9ca3af;">kWh</span>`;
-
-            let badgesHtml = `<div class="fleet-status-badge"><div class="status-dot"></div><div class="status-count">${okCount} OK</div></div>`;
-            if (lowCount > 0) badgesHtml += `<div class="fleet-status-badge warn"><div class="status-dot"></div><div class="status-count">${lowCount} Low</div></div>`;
-            if (offlineCount > 0) badgesHtml += `<div class="fleet-status-badge error"><div class="status-dot"></div><div class="status-count">${offlineCount} Offline</div></div>`;
-            document.getElementById('statusBadges').innerHTML = badgesHtml;
-
-            const latestUpdate = allSitesData
-                .filter(s => s.last_updated).map(s => s.last_updated).sort().reverse()[0] || 'N/A';
-            document.getElementById('lastUpdated').textContent = `Updated ${latestUpdate}`;
-
+        function updateDashboard(){
+            const tot=allSitesData.reduce((s,d)=>s+(d.total_kwh||0),0);
+            const ok=allSitesData.filter(s=>s.status==='ok').length;
+            const lo=allSitesData.filter(s=>s.status==='low').length;
+            const off=allSitesData.filter(s=>s.status==='offline'||!s.loaded).length;
+            document.getElementById('fleetTotal').innerHTML=`${tot.toFixed(1)} <span style="font-size:1.5rem;color:#9ca3af">kWh</span>`;
+            let bh=`<div class="fleet-status-badge"><div class="status-dot"></div><div class="status-count">${ok} OK</div></div>`;
+            if(lo)bh+=`<div class="fleet-status-badge warn"><div class="status-dot"></div><div class="status-count">${lo} Low</div></div>`;
+            if(off)bh+=`<div class="fleet-status-badge error"><div class="status-dot"></div><div class="status-count">${off} Offline</div></div>`;
+            document.getElementById('statusBadges').innerHTML=bh;
+            const latest=allSitesData.filter(s=>s.last_updated).map(s=>s.last_updated).sort().reverse()[0]||'N/A';
+            document.getElementById('lastUpdated').textContent=`Updated ${latest}`;
             renderCards();
         }
 
-        function renderCards() {
-            const container = document.getElementById('sitesContainer');
-            container.innerHTML = '';
-
-            allSitesData.forEach(site => {
-                const card = createSiteCard(site);
-                if (currentFilter !== 'all' && site.platform !== currentFilter) {
-                    card.classList.add('hidden');
-                }
-                container.appendChild(card);
+        function renderCards(){
+            const c=document.getElementById('sitesContainer');c.innerHTML='';
+            allSitesData.forEach(site=>{
+                const card=createSiteCard(site);
+                if(currentFilter!=='all'&&site.platform!==currentFilter)card.classList.add('hidden');
+                c.appendChild(card);
             });
-
-            setTimeout(() => {
-                allSitesData.forEach(site => {
-                    if (currentFilter === 'all' || site.platform === currentFilter) {
-                        renderSiteChart(site);
-                    }
-                });
-            }, 100);
+            setTimeout(()=>{allSitesData.forEach(site=>{
+                if(currentFilter==='all'||site.platform===currentFilter)renderSiteChart(site);
+            })},100);
         }
 
-        // =================================================================
-        // SITE CARD
-        // =================================================================
-        function createSiteCard(site) {
-            const card = document.createElement('div');
-            card.className = `site-card ${site.status}`;
-            card.setAttribute('data-platform', site.platform);
-            card.onclick = () => window.open(site.dashboardUrl, '_blank');
+        function getIrradPct(site){
+            const ir=getIr(site),stats=site.stats_30day||{},avg=stats.hourly_irrad_avg||[];
+            const lh=site.last_hour||0;
+            if(lh<6||!avg.length)return null;
+            const tCum=ir.slice(0,lh+1).reduce((a,b)=>a+b,0);
+            const aCum=avg.slice(0,lh+1).reduce((a,b)=>a+b,0);
+            if(aCum<10)return null;
+            return Math.round((tCum/aCum)*100);
+        }
 
-            const chartId = `chart-${site.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`;
-            const stats = site.stats_30day || {};
-            const dailyAvg = stats.daily_avg || 0;
-            const totalKwh = site.total_kwh || 0;
+        function createSiteCard(site){
+            const card=document.createElement('div');
+            card.className='site-card';
+            card.setAttribute('data-platform',site.platform);
+            card.onclick=()=>window.open(site.dashboardUrl,'_blank');
+            const cid=`chart-${site.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`;
+            const stats=site.stats_30day||{},avg=stats.daily_avg||0,kwh=site.total_kwh||0,st=site.status||'offline';
+            const poa=avg>0?Math.round((kwh/avg)*100):0;
+            const poaCls=poa>=70?'good':poa>=40?'warn':'bad';
+            const ha=stats.hourly_avg||[],lh=site.last_hour||0;
+            const ebn=ha.slice(0,lh+1).reduce((a,b)=>a+b,0);
+            const pace=ebn>0?Math.round((kwh/ebn)*100):0;
+            const paceCls=pace>=80?'good':pace>=50?'warn':'bad';
+            const irPct=getIrradPct(site);
+            const irBadge=irPct!==null
+                ?`<div class="site-stat-badge irrad">${irPct}% irrad</div>`
+                :`<div class="site-stat-badge irrad">-- irrad</div>`;
+            const pl={fusionsolar:'FusionSolar',goodwe:'GoodWe',sunsynk:'Sunsynk'}[site.platform]||'';
+            const stLabel=st==='offline'?'OFFLINE':st==='low'?'LOW':'OK';
 
-            const pctOfAvg = dailyAvg > 0 ? Math.round((totalKwh / dailyAvg) * 100) : 0;
-            const pctClass = pctOfAvg >= 70 ? 'good' : pctOfAvg >= 40 ? 'warn' : 'bad';
-
-            const hourlyAvg = stats.hourly_avg || [];
-            const lastHour = site.last_hour || 0;
-            const expectedByNow = hourlyAvg.slice(0, lastHour + 1).reduce((a, b) => a + b, 0);
-            const paceRatio = expectedByNow > 0 ? Math.round((totalKwh / expectedByNow) * 100) : 0;
-            const paceClass = paceRatio >= 80 ? 'good' : paceRatio >= 50 ? 'warn' : 'bad';
-
-            const platformLabel = { fusionsolar: 'FusionSolar', goodwe: 'GoodWe', sunsynk: 'Sunsynk' }[site.platform] || '';
-
-            const todayLegend = `
-                <div class="mini-legend-item"><div class="mini-legend-swatch" style="background:#22c55e;"></div>PV</div>
-                <div class="mini-legend-item"><div class="mini-legend-swatch" style="background:rgba(202,138,4,0.7);"></div>Irrad</div>
-                <div class="mini-legend-item"><div class="mini-legend-swatch" style="background:rgba(96,165,250,0.6);border-top:1px dashed rgba(96,165,250,0.6);height:0;"></div>Avg</div>
-            `;
-            const avgLegend = `
-                <div class="mini-legend-item"><div class="mini-legend-swatch" style="background:#22c55e;border-top:1px dashed #22c55e;height:0;"></div>Today</div>
-                <div class="mini-legend-item"><div class="mini-legend-swatch" style="background:#60a5fa;border-top:1px dashed #60a5fa;height:0;"></div>Median</div>
-                <div class="mini-legend-item"><div class="mini-legend-swatch" style="background:rgba(34,197,94,0.3);"></div>P25-75</div>
-                <div class="mini-legend-item"><div class="mini-legend-swatch" style="background:rgba(180,140,60,0.8);"></div>Min</div>
-                <div class="mini-legend-item"><div class="mini-legend-swatch" style="background:rgba(150,100,220,0.8);"></div>Max</div>
-            `;
-
-            card.innerHTML = `
-                <div class="site-info">
-                    <div class="site-left">
-                        <div class="site-header">
-                            <div class="site-name">${site.name}</div>
-                            <div class="status-indicator ${site.status}"></div>
-                            <span class="site-platform ${site.platform}">${platformLabel}</span>
-                        </div>
-                        <div class="site-production">${totalKwh.toFixed(1)} <span style="font-size: 0.9rem; color: #9ca3af;">kWh</span></div>
-                        <div class="site-status ${site.status}">${(site.status || 'offline').toUpperCase()}</div>
+            card.innerHTML=`
+                <div class="site-topbar">
+                    <div class="site-topbar-left">
+                        <div class="site-name">${site.name}</div>
+                        <div class="status-indicator ${st}"></div>
+                        <span class="site-platform ${site.platform}">${pl}</span>
+                        <div class="site-kwh">${kwh.toFixed(1)} <span>kWh</span></div>
+                        <div class="site-status-label ${st}">${stLabel}</div>
                     </div>
-                    <div style="text-align: right;">
-                        <div class="site-stat-badge ${pctClass}">${pctOfAvg}% of avg</div>
-                        <div class="site-stat-badge ${paceClass}" style="margin-top:4px;">${paceRatio}% pace</div>
+                    <div class="site-badges">
+                        <div class="site-stat-badge ${poaCls}">${poa}% of avg</div>
+                        <div class="site-stat-badge ${paceCls}">${pace}% pace</div>
+                        ${irBadge}
                     </div>
                 </div>
-                <div class="mini-legend" id="legend-${chartId}">
-                    ${currentMiniMode === 'today' ? todayLegend : avgLegend}
-                </div>
-                <div class="site-chart-wrapper">
-                    <div class="site-chart-container">
-                        <canvas id="${chartId}"></canvas>
-                    </div>
-                </div>
-            `;
+                <div class="site-chart-wrapper"><div class="site-chart-container"><canvas id="${cid}"></canvas></div></div>`;
             return card;
         }
 
-        // =================================================================
-        // MINI CHART
-        // =================================================================
-        function truncateAtLastHour(arr) {
-            let last = 0;
-            for (let i = arr.length - 1; i >= 0; i--) { if (arr[i] > 0) { last = i; break; } }
-            return arr.map((v, i) => i <= last ? v : null);
-        }
+        function trunc(arr){let l=0;for(let i=arr.length-1;i>=0;i--){if(arr[i]>0){l=i;break;}}return arr.map((v,i)=>i<=l?v:null);}
 
-        function renderSiteChart(site) {
-            const chartId = `chart-${site.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`;
-            const canvas = document.getElementById(chartId);
-            if (!canvas) return;
+        function renderSiteChart(site){
+            const cid=`chart-${site.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`;
+            const canvas=document.getElementById(cid);if(!canvas)return;
+            const ctx=canvas.getContext('2d');
+            const hrs=Array.from({length:24},(_,i)=>i);
+            const pv=getPv(site),stats=site.stats_30day||{},ir=getIr(site);
+            if(siteCharts[cid])siteCharts[cid].destroy();
 
-            const ctx = canvas.getContext('2d');
-            const hours = Array.from({length: 24}, (_, i) => i);
-            const hourlyPv = getHourlyPv(site);
-            const stats = site.stats_30day || {};
-            const irradiation = (site.today && site.today.irradiation) || site.irradiation || new Array(24).fill(0);
+            if(currentMiniMode==='today'){
+                // Scale irradiation so it visually sits below PV bars
+                const maxPv=Math.max(...pv,...(stats.hourly_avg||[0]),1);
+                const maxIr=Math.max(...ir,1);
+                // irrad peak should appear at ~70% of PV axis height
+                const y1Max=maxIr*(maxPv/(maxIr*0.7))||maxIr*2;
 
-            if (siteCharts[chartId]) siteCharts[chartId].destroy();
-
-            let datasets;
-
-            if (currentMiniMode === 'today') {
-                datasets = [
-                    { type:'line', label:'Irrad', data:irradiation, backgroundColor:'rgba(133,77,14,0.5)', borderColor:'rgba(202,138,4,0.7)', borderWidth:0.5, fill:true, yAxisID:'y1', pointRadius:0, tension:0.4, order:3 },
-                    { type:'line', label:'Avg', data:stats.hourly_avg||new Array(24).fill(0), borderColor:'rgba(96,165,250,0.6)', borderWidth:1, borderDash:[3,2], fill:false, pointRadius:0, tension:0.4, order:1 },
-                    { type:'bar', label:'Today', data:hourlyPv, backgroundColor:'#22c55e', borderWidth:0, barPercentage:0.8, categoryPercentage:0.9, order:2 }
-                ];
+                siteCharts[cid]=new Chart(ctx,{type:'bar',data:{labels:hrs,datasets:[
+                    {type:'line',label:'Irrad',data:ir,backgroundColor:'rgba(133,77,14,0.5)',borderColor:'rgba(202,138,4,0.7)',borderWidth:0.5,fill:true,yAxisID:'y1',pointRadius:0,tension:0.4,order:3},
+                    {type:'line',label:'Avg',data:stats.hourly_avg||new Array(24).fill(0),borderColor:'rgba(96,165,250,0.6)',borderWidth:1,borderDash:[3,2],fill:false,pointRadius:0,tension:0.4,order:1},
+                    {type:'bar',label:'Today',data:pv,backgroundColor:'#22c55e',borderWidth:0,barPercentage:0.8,categoryPercentage:0.9,order:2}
+                ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{
+                    x:{grid:{color:'rgba(148,163,184,0.08)',drawBorder:false},ticks:{color:'#4b5563',font:{size:9},maxTicksLimit:6}},
+                    y:{beginAtZero:true,grid:{color:'rgba(148,163,184,0.08)',drawBorder:false},ticks:{color:'#4b5563',font:{size:9},maxTicksLimit:4}},
+                    y1:{beginAtZero:true,position:'right',display:false,grid:{drawOnChartArea:false},max:y1Max}
+                }}});
             } else {
-                datasets = [
-                    { type:'line', label:'Min', data:stats.hourly_min||new Array(24).fill(0), backgroundColor:'rgba(120,80,40,0.10)', borderColor:'rgba(180,140,60,0.7)', borderWidth:1, fill:'+1', pointRadius:0, tension:0.4, order:6 },
-                    { type:'line', label:'Max', data:stats.hourly_max||new Array(24).fill(0), backgroundColor:'transparent', borderColor:'rgba(150,100,220,0.7)', borderWidth:1, pointRadius:0, tension:0.4, order:6 },
-                    { type:'line', label:'P25-P75', data:stats.hourly_p25||new Array(24).fill(0), backgroundColor:'rgba(34,197,94,0.18)', borderColor:'rgba(34,197,94,0.4)', borderWidth:0.5, fill:'+1', pointRadius:0, tension:0.4, order:4 },
-                    { type:'line', label:'', data:stats.hourly_p75||new Array(24).fill(0), backgroundColor:'transparent', borderColor:'rgba(34,197,94,0.4)', borderWidth:0.5, pointRadius:0, tension:0.4, order:4 },
-                    { type:'line', label:'Median', data:stats.hourly_avg||new Array(24).fill(0), borderColor:'#60a5fa', borderWidth:1.5, borderDash:[4,3], fill:false, pointRadius:0, tension:0.4, order:2 },
-                    { type:'line', label:'Today', data:truncateAtLastHour(hourlyPv), borderColor:'#22c55e', borderWidth:1.5, borderDash:[4,2], fill:false, pointRadius:0, tension:0.4, order:1 }
-                ];
+                siteCharts[cid]=new Chart(ctx,{type:'bar',data:{labels:hrs,datasets:[
+                    {type:'line',label:'Min',data:stats.hourly_min||new Array(24).fill(0),backgroundColor:'rgba(120,80,40,0.10)',borderColor:'rgba(180,140,60,0.7)',borderWidth:1,fill:'+1',pointRadius:0,tension:0.4,order:6},
+                    {type:'line',label:'Max',data:stats.hourly_max||new Array(24).fill(0),backgroundColor:'transparent',borderColor:'rgba(150,100,220,0.7)',borderWidth:1,pointRadius:0,tension:0.4,order:6},
+                    {type:'line',label:'P25-P75',data:stats.hourly_p25||new Array(24).fill(0),backgroundColor:'rgba(34,197,94,0.18)',borderColor:'rgba(34,197,94,0.4)',borderWidth:0.5,fill:'+1',pointRadius:0,tension:0.4,order:4},
+                    {type:'line',label:'',data:stats.hourly_p75||new Array(24).fill(0),backgroundColor:'transparent',borderColor:'rgba(34,197,94,0.4)',borderWidth:0.5,pointRadius:0,tension:0.4,order:4},
+                    {type:'line',label:'Median',data:stats.hourly_avg||new Array(24).fill(0),borderColor:'#60a5fa',borderWidth:1.5,borderDash:[4,3],fill:false,pointRadius:0,tension:0.4,order:2},
+                    {type:'line',label:'Today',data:trunc(pv),borderColor:'#22c55e',borderWidth:1.5,borderDash:[4,2],fill:false,pointRadius:0,tension:0.4,order:1}
+                ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{
+                    x:{grid:{color:'rgba(148,163,184,0.08)',drawBorder:false},ticks:{color:'#4b5563',font:{size:9},maxTicksLimit:6}},
+                    y:{beginAtZero:true,grid:{color:'rgba(148,163,184,0.08)',drawBorder:false},ticks:{color:'#4b5563',font:{size:9},maxTicksLimit:4}}
+                }}});
             }
-
-            siteCharts[chartId] = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: hours, datasets: datasets },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                    scales: {
-                        x: { grid: { color:'rgba(148,163,184,0.08)', drawBorder:false }, ticks: { color:'#4b5563', font:{size:9}, maxTicksLimit:6 } },
-                        y: { beginAtZero:true, grid: { color:'rgba(148,163,184,0.08)', drawBorder:false }, ticks: { color:'#4b5563', font:{size:9}, maxTicksLimit:4 } },
-                        ...(currentMiniMode === 'today' ? { y1: { beginAtZero:true, position:'right', display:false, grid:{drawOnChartArea:false} } } : {})
-                    }
-                }
-            });
         }
 
-        // =================================================================
-        // FILTERS & MODE SWITCH
-        // =================================================================
-        function filterPlatform(platform, btn) {
-            currentFilter = platform;
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderCards();
+        function filterPlatform(p,btn){
+            currentFilter=p;
+            document.querySelectorAll('#filterRow .ctrl-btn').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');renderCards();
         }
-
-        function switchMiniMode(mode, btn) {
-            currentMiniMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderCards();
+        function switchMiniMode(m,btn){
+            currentMiniMode=m;
+            document.querySelectorAll('#modeRow .ctrl-btn').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');renderCards();
         }
     </script>
 </body>
