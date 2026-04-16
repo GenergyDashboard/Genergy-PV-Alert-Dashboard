@@ -182,6 +182,20 @@ const CHART_HOURS=Array.from({length:HOUR_END-HOUR_START},(_,i)=>i+HOUR_START);
 const CHART_LABELS=CHART_HOURS.map(h=>(h<10?'0':'')+h+':00');
 function sliceHours(arr){return(arr||new Array(24).fill(0)).slice(HOUR_START,HOUR_END)}
 
+// Returns today's date in SAST as YYYY-MM-DD
+function todaySAST(){
+    const now=new Date();
+    // Convert to SAST (UTC+2)
+    const sast=new Date(now.getTime()+(2*60-now.getTimezoneOffset())*60000);
+    return sast.toISOString().slice(0,10);
+}
+
+// Check if site's data is stale (date is not today)
+function isStale(site){
+    if(!site.loaded||!site.date)return true;
+    return site.date!==todaySAST();
+}
+
 let allSitesData=[],siteCharts={},currentMode='today',statusFilter=null;
 Chart.defaults.devicePixelRatio=window.devicePixelRatio*2||2;
 
@@ -279,13 +293,17 @@ async function loadAllSites(silent=false){
 
 // ── Dashboard ────────────────────────────────────────────────
 function updateDashboard(silent=false){
-    const tot=allSitesData.reduce((s,d)=>s+(d.total_kwh||0),0);
+    // Fleet total counts only sites with today's data (skip stale)
+    const tot=allSitesData.filter(s=>!isStale(s)).reduce((s,d)=>s+(d.total_kwh||0),0);
     let yFull=0,yByHour=0;
     allSitesData.forEach(s=>{const y=getYesterday(s);yFull+=y.full;yByHour+=y.byHour});
     document.getElementById('fleetTotal').innerHTML=`${fmt(tot,1)} <span>kWh</span>`;
     document.getElementById('yestVal').textContent=`${fmtI(yFull)} kWh`;
     document.getElementById('yestByHourVal').textContent=`${fmtI(yByHour)} kWh`;
-    const ok=allSitesData.filter(s=>s.status==='ok').length,lo=allSitesData.filter(s=>s.status==='low').length,off=allSitesData.filter(s=>s.status==='offline'||!s.loaded).length;
+    // Status counts: stale data treated as offline
+    const ok=allSitesData.filter(s=>!isStale(s)&&s.status==='ok').length;
+    const lo=allSitesData.filter(s=>!isStale(s)&&s.status==='low').length;
+    const off=allSitesData.filter(s=>isStale(s)||s.status==='offline'||!s.loaded).length;
     let bh='';
     if(ok)bh+=`<div class="fleet-badge ok-b${statusFilter==='ok'?' active':''}" onclick="toggleStatus('ok')"><div class="bd"></div><div class="bc">${ok} OK</div></div>`;
     if(lo)bh+=`<div class="fleet-badge low-b${statusFilter==='low'?' active':''}" onclick="toggleStatus('low')"><div class="bd"></div><div class="bc">${lo} Low</div></div>`;
@@ -327,7 +345,14 @@ function siteVisible(site){
     if(!getSelPlatforms().includes(site.platform))return false;
     const sg=getSelGroups();
     if(sg.length>0){const ag=ldGrp();if(!sg.some(g=>(ag[g]||[]).includes(site.name)))return false}
-    if(statusFilter){const st=site.status||'offline';const isOff=st==='offline'||!site.loaded;if(statusFilter==='offline'&&!isOff)return false;if(statusFilter==='low'&&st!=='low')return false;if(statusFilter==='ok'&&st!=='ok')return false}
+    if(statusFilter){
+        const stale=isStale(site);
+        const st=site.status||'offline';
+        const isOff=stale||st==='offline'||!site.loaded;
+        if(statusFilter==='offline'&&!isOff)return false;
+        if(statusFilter==='low'&&(stale||st!=='low'))return false;
+        if(statusFilter==='ok'&&(stale||st!=='ok'))return false;
+    }
     return true;
 }
 function applyFilters(){
@@ -355,14 +380,20 @@ function createCard(site){
     const card=document.createElement('div');card.className='site-card';
     card.onclick=()=>window.open(site.dashboardUrl,'_blank');
     const cid=`c-${site.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`;
-    const kwh=site.total_kwh||0,st=site.status||'offline';
-    const stL=st==='offline'?'OFFLINE':st==='low'?'LOW':'OK';
+    const stale=isStale(site);
+    const kwh=site.total_kwh||0;
+    // If data is stale (not today), override status to 'offline' for display
+    const st=stale?'offline':(site.status||'offline');
+    const stL=stale?'STALE':st==='offline'?'OFFLINE':st==='low'?'LOW':'OK';
     const pl={fusionsolar:'FusionSolar',goodwe:'GoodWe',sunsynk:'Sunsynk'}[site.platform]||'';
-    const ap=calcAvgPct(site),apS=ap!==null?ap+'%':'--',apC=ap===null?'':ap>=70?'good':ap>=40?'warn':'bad';
-    const ip=calcIrradPct(site),ipS=ip!==null?ip+'%':'--';
+    // Hide stats when stale — they'd be misleading
+    const ap=stale?null:calcAvgPct(site),apS=ap!==null?ap+'%':'--',apC=ap===null?'':ap>=70?'good':ap>=40?'warn':'bad';
+    const ip=stale?null:calcIrradPct(site),ipS=ip!==null?ip+'%':'--';
+    // Show the date if it's stale so user knows how old the data is
+    const dateNote=stale&&site.date?` <span style="color:#ef4444;font-size:0.55rem;font-weight:700">${site.date}</span>`:'';
     card.innerHTML=`<div class="site-topbar"><div class="site-topbar-left">
         <div class="sn">${site.name}</div><div class="si ${st}"></div><span class="sp ${site.platform}">${pl}</span>
-        <div class="skwh">${fmt(kwh,1)} <i>kWh</i></div><div class="sl ${st}">${stL}</div>
+        <div class="skwh">${fmt(kwh,1)} <i>kWh</i></div><div class="sl ${st}">${stL}</div>${dateNote}
     </div><div class="site-badges">
         <div class="sb ${apC}">${apS} of avg</div>
         <div class="sb irr">${ipS} irrad</div>
