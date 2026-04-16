@@ -117,6 +117,11 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
             <div class="fleet-today">
                 <div class="fleet-total" id="fleetTotal">0 <span>kWh</span></div>
             </div>
+            <div class="fleet-side" style="text-align:left">
+                <div class="fleet-side-val" id="todayIrrVal" style="color:#eab308">--</div>
+                <div class="fleet-side-sub" id="yestIrrVal">--</div>
+                <div class="fleet-side-label" id="irrPctLabel">Today / Yesterday irradiation</div>
+            </div>
         </div>
         <div class="fleet-label">Total Fleet Generation Today</div>
         <div class="fleet-status-bar">
@@ -293,17 +298,45 @@ async function loadAllSites(silent=false){
 
 // ── Dashboard ────────────────────────────────────────────────
 function updateDashboard(silent=false){
-    // Fleet total counts only sites with today's data (skip stale)
-    const tot=allSitesData.filter(s=>!isStale(s)).reduce((s,d)=>s+(d.total_kwh||0),0);
+    // Filter sites based on current platform/group/status selections
+    // (status filter excluded here so counts are correct)
+    const sitesInScope=allSitesData.filter(s=>{
+        if(!getSelPlatforms().includes(s.platform))return false;
+        const sg=getSelGroups();
+        if(sg.length>0){const ag=ldGrp();if(!sg.some(g=>(ag[g]||[]).includes(s.name)))return false}
+        return true;
+    });
+
+    // Fleet total counts only sites in scope + not stale
+    const tot=sitesInScope.filter(s=>!isStale(s)).reduce((s,d)=>s+(d.total_kwh||0),0);
     let yFull=0,yByHour=0;
-    allSitesData.forEach(s=>{const y=getYesterday(s);yFull+=y.full;yByHour+=y.byHour});
+    sitesInScope.forEach(s=>{const y=getYesterday(s);yFull+=y.full;yByHour+=y.byHour});
     document.getElementById('fleetTotal').innerHTML=`${fmt(tot,1)} <span>kWh</span>`;
     document.getElementById('yestVal').textContent=`${fmtI(yFull)} kWh`;
     document.getElementById('yestByHourVal').textContent=`${fmtI(yByHour)} kWh`;
-    // Status counts: stale data treated as offline
-    const ok=allSitesData.filter(s=>!isStale(s)&&s.status==='ok').length;
-    const lo=allSitesData.filter(s=>!isStale(s)&&s.status==='low').length;
-    const off=allSitesData.filter(s=>isStale(s)||s.status==='offline'||!s.loaded).length;
+
+    // Irradiation TOTALS summed across sites in scope, cumulative to last_hour
+    // Compared with yesterday's irradiation up to the same hour.
+    let todayIrr=0,yestIrr=0;
+    sitesInScope.forEach(s=>{
+        if(isStale(s))return;
+        const lh=s.last_hour||0;
+        todayIrr+=getIr(s).slice(0,lh+1).reduce((a,b)=>a+b,0);
+        const h=s.history||{},dates=Object.keys(h).sort();
+        if(dates.length>=2){
+            yestIrr+=(h[dates[dates.length-2]]?.irradiation||[]).slice(0,lh+1).reduce((a,b)=>a+b,0);
+        }
+    });
+    const irrPct=yestIrr>0?Math.round((todayIrr/yestIrr)*100):0;
+    const irrColor=irrPct>=85?'#22c55e':irrPct>=60?'#eab308':'#fb923c';
+    document.getElementById('todayIrrVal').textContent=`${fmtI(todayIrr)} W/m²`;
+    document.getElementById('yestIrrVal').textContent=`${fmtI(yestIrr)} W/m²`;
+    document.getElementById('irrPctLabel').innerHTML=`Today / Yesterday irradiation · <span style="color:${irrColor};font-weight:700">${irrPct}%</span>`;
+
+    // Status counts respect scope too
+    const ok=sitesInScope.filter(s=>!isStale(s)&&s.status==='ok').length;
+    const lo=sitesInScope.filter(s=>!isStale(s)&&s.status==='low').length;
+    const off=sitesInScope.filter(s=>isStale(s)||s.status==='offline'||!s.loaded).length;
     let bh='';
     if(ok)bh+=`<div class="fleet-badge ok-b${statusFilter==='ok'?' active':''}" onclick="toggleStatus('ok')"><div class="bd"></div><div class="bc">${ok} OK</div></div>`;
     if(lo)bh+=`<div class="fleet-badge low-b${statusFilter==='low'?' active':''}" onclick="toggleStatus('low')"><div class="bd"></div><div class="bc">${lo} Low</div></div>`;
@@ -358,7 +391,7 @@ function siteVisible(site){
 function applyFilters(){
     document.querySelector('#platformDrop .dropdown-toggle').classList.toggle('has-sel',getSelPlatforms().length<3);
     document.querySelector('#groupDrop .dropdown-toggle').classList.toggle('has-sel',getSelGroups().length>0);
-    renderCards();
+    updateDashboard();
 }
 function clearAllFilters(btn){
     statusFilter=null;
@@ -366,7 +399,7 @@ function clearAllFilters(btn){
     document.querySelectorAll('#groupMenu input[type=checkbox]').forEach(c=>c.checked=false);
     document.querySelector('#platformDrop .dropdown-toggle').classList.remove('has-sel');
     document.querySelector('#groupDrop .dropdown-toggle').classList.remove('has-sel');
-    renderCards();
+    updateDashboard();
 }
 
 // ── Render cards ─────────────────────────────────────────────
