@@ -119,7 +119,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
                 <div class="fleet-side-val" id="yestVal">--</div>
                 <div class="fleet-side-sub" id="yestByHourVal">--</div>
                 <div class="fleet-side-pct" id="genPct" style="color:#6b7280">--%</div>
-                <div class="fleet-side-label">Yesterday (full / by hour / %)</div>
+                <div class="fleet-side-label">Yesterday (full / by hour)</div>
             </div>
             <div class="fleet-today">
                 <div class="fleet-total" id="fleetTotal">0 <span>kWh</span></div>
@@ -255,12 +255,19 @@ function toggleStatus(st){statusFilter=statusFilter===st?null:st;updateDashboard
 // Date navigation
 function dateBack(){const dp=document.getElementById('datePicker');const d=new Date(dp.value);d.setDate(d.getDate()-1);dp.value=d.toISOString().slice(0,10);goToDate(dp.value)}
 function dateForward(){const dp=document.getElementById('datePicker');const d=new Date(dp.value);d.setDate(d.getDate()+1);const today=todaySAST();dp.value=d.toISOString().slice(0,10);if(dp.value>today)dp.value=today;goToDate(dp.value)}
-function goToDate(dateStr){viewDate=dateStr===todaySAST()?null:dateStr;renderCards()}
+function goToDate(dateStr){viewDate=dateStr===todaySAST()?null:dateStr;updateDashboard()}
 
 function updateDashboard(silent=false){
     const scope=allSitesData.filter(s=>siteInScope(s));
-    const fresh=scope.filter(s=>!isStale(s));
-    const tot=fresh.reduce((s,d)=>s+(d.total_kwh||0),0);
+
+    // If viewing a past date, compute totals from that date's history
+    let tot=0;
+    if(viewDate){
+        scope.forEach(s=>{const hd=getHistDate(s,viewDate);if(hd)tot+=hd.total_kwh||0});
+    } else {
+        tot=scope.filter(s=>!isStale(s)).reduce((s,d)=>s+(d.total_kwh||0),0);
+    }
+
     let yFull=0,yByHour=0;
     scope.forEach(s=>{const y=getYesterday(s);yFull+=y.full;yByHour+=y.byHour});
     document.getElementById('fleetTotal').innerHTML=`${fmt(tot,1)} <span>kWh</span>`;
@@ -269,11 +276,22 @@ function updateDashboard(silent=false){
     // % of yesterday by hour
     const genPct=yByHour>0?Math.round((tot/yByHour)*100):0;
     const genPctEl=document.getElementById('genPct');
-    genPctEl.textContent=`${genPct}%`;
+    genPctEl.textContent=`${genPct}% vs yesterday`;
     genPctEl.style.color=genPct>=85?'#22c55e':genPct>=50?'#eab308':'#fb923c';
 
     let todayIrr=0,yestIrr=0;
-    fresh.forEach(s=>{const lh=s.last_hour||0;todayIrr+=getIr(s).slice(0,lh+1).reduce((a,b)=>a+b,0);const h=s.history||{},dates=Object.keys(h).sort();if(dates.length>=2)yestIrr+=(h[dates[dates.length-2]]?.irradiation||[]).slice(0,lh+1).reduce((a,b)=>a+b,0)});
+    const activeSites=viewDate?scope:scope.filter(s=>!isStale(s));
+    activeSites.forEach(s=>{
+        const lh=s.last_hour||0;
+        if(viewDate){
+            const hd=getHistDate(s,viewDate);
+            if(hd)todayIrr+=(hd.irradiation||[]).slice(0,24).reduce((a,b)=>a+b,0);
+        } else {
+            todayIrr+=getIr(s).slice(0,lh+1).reduce((a,b)=>a+b,0);
+        }
+        const h=s.history||{},dates=Object.keys(h).sort();
+        if(dates.length>=2)yestIrr+=(h[dates[dates.length-2]]?.irradiation||[]).slice(0,lh+1).reduce((a,b)=>a+b,0);
+    });
     const irrPct=yestIrr>0?Math.round((todayIrr/yestIrr)*100):0;
     const irrColor=irrPct>=85?'#22c55e':irrPct>=60?'#eab308':'#fb923c';
     document.getElementById('todayIrrVal').textContent=`${fmtI(todayIrr)} W/m²`;
@@ -311,14 +329,53 @@ function renderCards(){
 function createCard(site){
     const card=document.createElement('div');card.className='site-card';
     const cid=`c-${site.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`;
-    const stale=isStale(site);const kwh=site.total_kwh||0;
-    const st=stale?'offline':(site.status||'offline');
-    const stL=stale?'STALE':st==='offline'?'OFFLINE':st==='low'?'LOW':'OK';
+    const stale=isStale(site);
     const pl={fusionsolar:'FusionSolar',goodwe:'GoodWe',sunsynk:'Sunsynk'}[site.platform]||'';
-    const ap=stale?null:calcAvgPct(site),apS=ap!==null?ap+'%':'--',apC=ap===null?'':ap>=70?'good':ap>=40?'warn':'bad';
-    const ip=stale?null:calcIrradPct(site),ipS=ip!==null?ip+'%':'--';
-    const dateNote=stale&&site.date?`<span style="color:#ef4444;font-size:0.5rem;font-weight:700;margin-left:4px">${site.date}</span>`:'';
-    // Per-card mode
+
+    // If viewing a past date, pull that date's data for card values
+    let kwh,st,stL,dateNote='',cardPv,cardIr;
+    if(viewDate){
+        const hd=getHistDate(site,viewDate);
+        kwh=hd?hd.total_kwh||0:0;
+        st=kwh>0?'ok':'offline';
+        stL=hd?'':'NO DATA';
+        if(!hd)dateNote=`<span style="color:#6b7280;font-size:0.5rem;margin-left:4px">No data for ${viewDate}</span>`;
+        cardPv=hd?hd.hourly||new Array(24).fill(0):new Array(24).fill(0);
+        cardIr=hd?hd.irradiation||new Array(24).fill(0):new Array(24).fill(0);
+    } else {
+        kwh=site.total_kwh||0;
+        st=stale?'offline':(site.status||'offline');
+        stL=stale?'STALE':st==='offline'?'OFFLINE':st==='low'?'LOW':'OK';
+        dateNote=stale&&site.date?`<span style="color:#ef4444;font-size:0.5rem;font-weight:700;margin-left:4px">${site.date}</span>`:'';
+        cardPv=getPv(site);
+        cardIr=getIr(site);
+    }
+
+    // Calculate % of avg using the correct date's PV data
+    const stats=site.stats_30day||{},ha=stats.hourly_avg||[];
+    let ap=null;
+    if(!stale||viewDate){
+        const lh=viewDate?(function(){for(let i=23;i>=0;i--)if(cardPv[i]>0)return i;return 0})():(site.last_hour||0);
+        if(lh>=HOUR_START&&ha.length){
+            const exp=ha.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);
+            if(exp>=1)ap=Math.round(cardPv.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0)/exp*100);
+        }
+    }
+    const apS=ap!==null?ap+'%':'--',apC=ap===null?'':ap>=70?'good':ap>=40?'warn':'bad';
+
+    // Irradiation %
+    let ip=null;
+    const avgIr=stats.hourly_irrad_avg||[];
+    if((!stale||viewDate)&&avgIr.length){
+        const lh=viewDate?(function(){for(let i=23;i>=0;i--)if(cardPv[i]>0)return i;return 0})():(site.last_hour||0);
+        if(lh>=HOUR_START){
+            const tC=cardIr.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);
+            const aC=avgIr.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);
+            if(aC>=10)ip=Math.round((tC/aC)*100);
+        }
+    }
+    const ipS=ip!==null?ip+'%':'--';
+
     const cardMode=cardOverrides[cid]||currentMode;
     const toggleLabel=cardMode==='today'?'30D':'T';
     const toggleTitle=cardMode==='today'?'Switch to 30-Day Avg':'Switch to Today';
