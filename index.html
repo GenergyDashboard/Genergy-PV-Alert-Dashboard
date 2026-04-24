@@ -12,13 +12,12 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 .header{text-align:center;margin-bottom:18px}
 .header h1{font-size:1.6rem;margin-bottom:4px;color:#fff;font-weight:500}
 .last-updated{color:#64748b;font-size:0.75rem}
-
-/* Fleet Summary */
 .fleet-summary{background:linear-gradient(135deg,#1a2332,#1e2936);border-radius:14px;padding:22px;margin-bottom:14px;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
 .fleet-top{display:flex;align-items:flex-end;justify-content:center;gap:32px;margin-bottom:4px}
 .fleet-side{text-align:right;padding-bottom:6px;min-width:120px}
 .fleet-side-val{font-size:1.2rem;font-weight:600;color:#9ca3af}
 .fleet-side-sub{font-size:0.95rem;font-weight:500;color:#6b7280}
+.fleet-side-pct{font-size:0.8rem;font-weight:700;margin-top:2px}
 .fleet-side-label{font-size:0.6rem;color:#6b7280;margin-top:1px}
 .fleet-today{text-align:center}
 .fleet-total{font-size:3.2rem;font-weight:700;color:#fff;line-height:1}
@@ -37,14 +36,10 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 .ok-b .bd{background:#22c55e;box-shadow:0 0 6px #22c55e}.low-b .bd{background:#fb923c;box-shadow:0 0 6px #fb923c}.off-b .bd{background:#6b7280;box-shadow:0 0 6px #6b7280}
 .bc{font-weight:700;font-size:0.8rem}
 .ok-b .bc{color:#22c55e}.low-b .bc{color:#fb923c}.off-b .bc{color:#6b7280}
-
-/* Controls row */
 .controls{display:flex;justify-content:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
 .ctrl-btn{padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:rgba(15,20,25,0.4);color:#9ca3af;cursor:pointer;font-size:0.72rem;font-weight:500;transition:all 0.25s}
 .ctrl-btn:hover{background:rgba(59,130,246,0.2);border-color:#3b82f6;color:#60a5fa}
 .ctrl-btn.active{background:#3b82f6;border-color:#3b82f6;color:#fff}
-
-/* Dropdown */
 .dropdown{position:relative;display:inline-block}
 .dropdown-toggle{padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:rgba(15,20,25,0.4);color:#9ca3af;cursor:pointer;font-size:0.72rem;font-weight:500;transition:all 0.25s}
 .dropdown-toggle:hover{background:rgba(59,130,246,0.2);border-color:#3b82f6;color:#60a5fa}
@@ -64,20 +59,25 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 .group-sites label:hover{color:#fff}
 .group-del{font-size:0.6rem;color:#ef4444;cursor:pointer;margin-left:auto;padding:2px 6px;border-radius:3px}
 .group-del:hover{background:rgba(239,68,68,0.2)}
-
-/* Legend */
 .legend-bar{display:flex;justify-content:center;gap:14px;margin-bottom:10px;flex-wrap:wrap}
 .legend-item{display:flex;align-items:center;gap:4px;font-size:0.65rem;color:#6b7280}
 .legend-swatch{width:16px;height:4px;border-radius:1px}
-
+/* Date nav */
+.date-nav{display:flex;align-items:center;gap:6px}
+.date-nav button{background:rgba(15,20,25,0.4);border:1px solid rgba(255,255,255,0.1);color:#9ca3af;border-radius:5px;padding:4px 8px;cursor:pointer;font-size:0.7rem;transition:all 0.2s}
+.date-nav button:hover{background:rgba(59,130,246,0.2);color:#60a5fa;border-color:#3b82f6}
+.date-nav input[type=date]{background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:5px;color:#e2e8f0;padding:4px 8px;font-size:0.68rem}
 /* Site cards */
 .sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:20px}
 .site-card{background:linear-gradient(135deg,#1a2332,#1e2936);border-radius:12px;box-shadow:0 3px 12px rgba(0,0,0,0.3);transition:all 0.3s;cursor:pointer;border:2px solid rgba(255,255,255,0.08);overflow:hidden;display:flex;flex-direction:column}
 .site-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.5);border-color:rgba(255,255,255,0.2)}
 .site-card.hidden{display:none}
-.site-topbar{padding:10px 12px 3px;display:flex;justify-content:space-between;align-items:center;gap:6px}
-.site-topbar-left{display:flex;align-items:center;gap:5px;min-width:0;flex-wrap:wrap}
-.sn{font-size:0.85rem;font-weight:700;color:#fff;white-space:nowrap}
+/* Two-row card header */
+.site-topbar{padding:10px 12px 4px}
+.site-row1{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:2px}
+.site-row1-left{display:flex;align-items:center;gap:5px;min-width:0}
+.site-row2{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.sn{font-size:0.85rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .si{width:8px;height:8px;border-radius:50%;box-shadow:0 0 6px currentColor;flex-shrink:0}
 .si.ok{background:#22c55e;color:#22c55e}.si.low{background:#fb923c;color:#fb923c}.si.offline{background:#6b7280;color:#6b7280}
 .sp{font-size:0.5rem;font-weight:700;padding:2px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.4px;flex-shrink:0}
@@ -91,14 +91,20 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 .site-badges{display:flex;flex-direction:column;gap:2px;align-items:flex-end;flex-shrink:0}
 .sb{font-size:0.62rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(255,255,255,.05);white-space:nowrap}
 .sb.good{color:#22c55e}.sb.warn{color:#fb923c}.sb.bad{color:#ef4444}.sb.irr{color:#eab308}
+/* Per-card toggle */
+.card-toggle{font-size:0.5rem;padding:2px 6px;border-radius:3px;border:1px solid rgba(255,255,255,0.1);background:rgba(15,20,25,0.4);color:#6b7280;cursor:pointer;transition:all 0.2s;position:absolute;top:6px;right:6px;z-index:10}
+.card-toggle:hover{color:#60a5fa;border-color:#3b82f6}
 .site-chart-wrapper{flex:1;min-height:160px;position:relative;padding:2px 6px 6px}
 .site-chart-container{position:absolute;top:0;left:6px;right:6px;bottom:6px}
-
+/* TV Scroll arrows */
+.scroll-arrows{position:fixed;right:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:60}
+.scroll-arrow{width:36px;height:36px;border-radius:50%;background:rgba(30,41,54,0.9);border:1px solid rgba(255,255,255,0.15);color:#9ca3af;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all 0.2s;box-shadow:0 2px 10px rgba(0,0,0,0.3)}
+.scroll-arrow:hover{background:rgba(59,130,246,0.3);border-color:#3b82f6;color:#fff}
 .refresh-btn{position:fixed;bottom:20px;right:20px;padding:8px 16px;border-radius:18px;border:none;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;cursor:pointer;font-size:0.75rem;font-weight:600;box-shadow:0 4px 15px rgba(59,130,246,0.4);transition:all 0.3s;z-index:50}
 .refresh-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(59,130,246,0.6)}
 .loading{text-align:center;padding:50px;font-size:1.1rem;color:#94a3b8}
 .footer-note{text-align:left;color:#64748b;font-size:0.65rem;margin-top:10px;padding-left:4px}
-@media(max-width:500px){.sites-grid{grid-template-columns:1fr}.fleet-top{flex-direction:column;align-items:center;gap:10px}}
+@media(max-width:500px){.sites-grid{grid-template-columns:1fr}.fleet-top{flex-direction:column;align-items:center;gap:10px}.scroll-arrows{display:none}}
 </style>
 </head>
 <body>
@@ -112,7 +118,8 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
             <div class="fleet-side">
                 <div class="fleet-side-val" id="yestVal">--</div>
                 <div class="fleet-side-sub" id="yestByHourVal">--</div>
-                <div class="fleet-side-label">Yesterday (full / by hour)</div>
+                <div class="fleet-side-pct" id="genPct" style="color:#6b7280">--%</div>
+                <div class="fleet-side-label">Yesterday (full / by hour / %)</div>
             </div>
             <div class="fleet-today">
                 <div class="fleet-total" id="fleetTotal">0 <span>kWh</span></div>
@@ -142,15 +149,26 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
             <button class="dropdown-toggle" onclick="toggleDrop('groupMenu')">Client Group ▾</button>
             <div class="dropdown-menu" id="groupMenu"></div>
         </div>
-        <button class="ctrl-btn active" onclick="clearAllFilters(this)">All</button>
+        <button class="ctrl-btn" onclick="clearAllFilters()">All</button>
         <span style="color:#374151">|</span>
-        <button class="ctrl-btn active" id="modeToday" onclick="switchMode('today')">Today</button>
-        <button class="ctrl-btn" id="modeAvg" onclick="switchMode('average')">30-Day Average</button>
+        <button class="ctrl-btn" id="modeToday" onclick="switchMode('today')">Today</button>
+        <button class="ctrl-btn active" id="modeAvg" onclick="switchMode('average')">30-Day Average</button>
+        <span style="color:#374151">|</span>
+        <div class="date-nav">
+            <button onclick="dateBack()" title="Previous day">◀</button>
+            <input type="date" id="datePicker" onchange="goToDate(this.value)">
+            <button onclick="dateForward()" title="Next day">▶</button>
+        </div>
     </div>
     <div class="legend-bar" id="legendBar"></div>
     <div id="sitesContainer" class="sites-grid"><div class="loading">Loading site data...</div></div>
     <div class="footer-note">Auto-refreshes every 5 min · Scrapers run 05:00–21:00 SAST</div>
     <button class="refresh-btn" onclick="loadAllSites()">🔄 Refresh</button>
+</div>
+<!-- TV scroll arrows -->
+<div class="scroll-arrows">
+    <button class="scroll-arrow" onclick="window.scrollBy({top:-400,behavior:'smooth'})" title="Scroll up">▲</button>
+    <button class="scroll-arrow" onclick="window.scrollBy({top:400,behavior:'smooth'})" title="Scroll down">▼</button>
 </div>
 <script>
 const BASE="https://genergydashboard.github.io";
@@ -162,10 +180,14 @@ const ALL_SITES=[
 {name:"Keypak Part 2",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/keypak-part-2/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/keypak-part-2/`},
 {name:"MP The Pines",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mp-the-pines/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mp-the-pines/`},
 {name:"Mountain View SC",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mountain-view-sc/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mountain-view-sc/`},
+{name:"Nautica Shopping Centre",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/nautica-sc/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/nautica-sc/`},
 {name:"RDM Somerset West 5MW",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/rdm-somerset-west/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/rdm-somerset-west/`},
 {name:"WG Nurture Health",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-nurture-health/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-nurture-health/`},
 {name:"Shoprite Parklands",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/shoprite-parklands/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/shoprite-parklands/`},
 {name:"WG Mdantsane SuperSpar",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-mdantsane-superspar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-mdantsane-superspar/`},
+{name:"Addo Spar",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/addo-spar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/addo-spar/`},
+{name:"Kirkwood FNB",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-fnb/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-fnb/`},
+{name:"Kirkwood Spar",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-spar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-spar/`},
 {name:"Aurora",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/aurora/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/aurora/`},
 {name:"BMI Isuzu",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/bmi-isuzu/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/bmi-isuzu/`},
 {name:"WG Bloomingdales",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-bloomingdales/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-bloomingdales/`},
@@ -175,180 +197,97 @@ const ALL_SITES=[
 {name:"WG Gonubie Mall",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-gonubie-mall/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-gonubie-mall/`},
 {name:"WG Heritage Mall",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-heritage-mall/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-heritage-mall/`},
 {name:"WG Wellington Square",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-wellington-square/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-wellington-square/`},
-{name:"Addo Spar",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/addo-spar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/addo-spar/`},
-{name:"Kirkwood FNB",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-fnb/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-fnb/`},
-{name:"Kirkwood Spar",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-spar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-spar/`},
 {name:"Kirkwood Tops",platform:"sunsynk",dataUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-tops/data/processed.json`,dashboardUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-tops/`},
-
-// ── FusionSolar (standalone sites) ──────────────────────────
-{name:"Nautica Shopping Centre",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/nautica-sc/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/nautica-sc/`},
 ];
 
-// Chart hours: 05:00-21:00 only
-const HOUR_START=5, HOUR_END=21;
-const CHART_HOURS=Array.from({length:HOUR_END-HOUR_START},(_,i)=>i+HOUR_START);
-const CHART_LABELS=CHART_HOURS.map(h=>(h<10?'0':'')+h+':00');
-function sliceHours(arr){return(arr||new Array(24).fill(0)).slice(HOUR_START,HOUR_END)}
+const HOUR_START=5,HOUR_END=21;
+const CHART_LABELS=Array.from({length:HOUR_END-HOUR_START},(_,i)=>{const h=i+HOUR_START;return(h<10?'0':'')+h+':00'});
+function slH(arr){return(arr||new Array(24).fill(0)).slice(HOUR_START,HOUR_END)}
 
-// Returns today's date in SAST as YYYY-MM-DD
-function todaySAST(){
-    const now=new Date();
-    // Convert to SAST (UTC+2)
-    const sast=new Date(now.getTime()+(2*60-now.getTimezoneOffset())*60000);
-    return sast.toISOString().slice(0,10);
-}
-
-// Check if site's data is stale (date is not today)
-function isStale(site){
-    if(!site.loaded||!site.date)return true;
-    return site.date!==todaySAST();
-}
-
-let allSitesData=[],siteCharts={},currentMode='today',statusFilter=null;
+let allSitesData=[],siteCharts={},currentMode='average',statusFilter=null,viewDate=null;
+let cardOverrides={};// per-card mode overrides: {cardId:'today'|'average'}
 Chart.defaults.devicePixelRatio=window.devicePixelRatio*2||2;
 
-// ── Number formatting ────────────────────────────────────────
 function fmt(n,d=1){const f=Number(n).toFixed(d);const[i,dec]=f.split('.');return i.replace(/\B(?=(\d{3})+(?!\d))/g,' ')+(dec!==undefined?'.'+dec:'')}
 function fmtI(n){return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ')}
-
-// ── Data helpers ─────────────────────────────────────────────
 function getPv(s){return(s.today&&s.today.hourly_pv)||s.hourly_pv||new Array(24).fill(0)}
 function getIr(s){return(s.today&&s.today.irradiation)||s.irradiation||new Array(24).fill(0)}
+function todaySAST(){const n=new Date();const s=new Date(n.getTime()+(2*60-n.getTimezoneOffset())*60000);return s.toISOString().slice(0,10)}
+function isStale(site){if(!site.loaded||!site.date)return true;return site.date!==todaySAST()}
+function calcAvgPct(site){const s=site.stats_30day||{},ha=s.hourly_avg||[];const lh=site.last_hour||0;if(lh<HOUR_START||!ha.length)return null;const e=ha.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);if(e<1)return null;return Math.round(getPv(site).slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0)/e*100)}
+function calcIrradPct(site){const ir=getIr(site),s=site.stats_30day||{},avg=s.hourly_irrad_avg||[];const lh=site.last_hour||0;if(lh<HOUR_START||!avg.length)return null;const tC=ir.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0),aC=avg.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);if(aC<10)return null;return Math.round((tC/aC)*100)}
+function getYesterday(site){const h=site.history||{},d=Object.keys(h).sort();if(d.length<2)return{full:0,byHour:0};const yd=d[d.length-2],yD=h[yd]||{};const lh=site.last_hour||0;return{full:yD.total_kwh||0,byHour:(yD.hourly||new Array(24).fill(0)).slice(0,lh+1).reduce((a,b)=>a+b,0)}}
+// Get data for a specific past date from history
+function getHistDate(site,dateStr){const h=site.history||{};return h[dateStr]||null}
 
-function calcAvgPct(site){
-    const stats=site.stats_30day||{},ha=stats.hourly_avg||[];
-    const lh=site.last_hour||0;
-    if(lh<HOUR_START||!ha.length)return null;
-    const exp=ha.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);
-    if(exp<1)return null;
-    const actual=getPv(site).slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);
-    return Math.round((actual/exp)*100);
-}
-function calcIrradPct(site){
-    const ir=getIr(site),stats=site.stats_30day||{},avg=stats.hourly_irrad_avg||[];
-    const lh=site.last_hour||0;
-    if(lh<HOUR_START||!avg.length)return null;
-    const tC=ir.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);
-    const aC=avg.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);
-    if(aC<10)return null;
-    return Math.round((tC/aC)*100);
-}
-function getYesterday(site){
-    const h=site.history||{},d=Object.keys(h).sort();
-    if(d.length<2)return{full:0,byHour:0};
-    const yd=d[d.length-2],yData=h[yd]||{};
-    const full=yData.total_kwh||0;
-    const lh=site.last_hour||0;
-    const yHourly=yData.hourly||new Array(24).fill(0);
-    const byHour=yHourly.slice(0,lh+1).reduce((a,b)=>a+b,0);
-    return{full,byHour};
-}
-
-// ── Client Groups (localStorage) ─────────────────────────────
+// Client Groups
 function ldGrp(){try{return JSON.parse(localStorage.getItem('g_groups'))||{}}catch(e){return{}}}
 function svGrp(g){localStorage.setItem('g_groups',JSON.stringify(g))}
 let editingGroup='';
-function buildGroupMenu(){
-    const groups=ldGrp(),menu=document.getElementById('groupMenu');
-    const gn=Object.keys(groups);
-    let html='<div class="dropdown-header">Select Group</div>';
-    if(!gn.length)html+='<div class="dropdown-item" style="color:#6b7280;font-size:0.7rem">No groups yet</div>';
-    else gn.forEach(g=>{
-        html+=`<div class="dropdown-item" style="justify-content:space-between">
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1">
-                <input type="checkbox" value="${g}" onchange="applyFilters()" ${editingGroup===g?'checked':''}> ${g} (${groups[g].length})
-            </label>
-            <span class="group-del" onclick="event.stopPropagation();deleteGroup('${g}')">✕</span>
-        </div>`;
-    });
-    html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Create New Group</div>
-        <div class="group-row"><input id="newGrpName" placeholder="Group name..." onkeydown="if(event.key==='Enter')createGroup()"><button onclick="createGroup()">Create</button></div>`;
-    if(gn.length){
-        html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Edit Group</div>
-            <div class="group-row"><select id="editGrpSel" style="flex:1;background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#e2e8f0;padding:5px;font-size:0.72rem" onchange="editingGroup=this.value;buildGroupMenu()">
-                <option value="">Choose group to edit...</option>${gn.map(g=>`<option value="${g}" ${editingGroup===g?'selected':''}>${g}</option>`).join('')}
-            </select></div>`;
-        if(editingGroup&&groups[editingGroup]){
-            html+=`<div class="group-sites">`;
-            ALL_SITES.forEach(s=>{
-                const inG=groups[editingGroup].includes(s.name);
-                html+=`<label><input type="checkbox" ${inG?'checked':''} onchange="togSiteGrp('${s.name}',this.checked)"> ${s.name}</label>`;
-            });
-            html+=`</div>`;
-        }
-    }
-    menu.innerHTML=html;
-}
+function buildGroupMenu(){const groups=ldGrp(),menu=document.getElementById('groupMenu'),gn=Object.keys(groups);let html='<div class="dropdown-header">Select Group</div>';if(!gn.length)html+='<div class="dropdown-item" style="color:#6b7280;font-size:0.7rem">No groups yet</div>';else gn.forEach(g=>{html+=`<div class="dropdown-item" style="justify-content:space-between"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1"><input type="checkbox" value="${g}" onchange="applyFilters()"> ${g} (${groups[g].length})</label><span class="group-del" onclick="event.stopPropagation();deleteGroup('${g}')">✕</span></div>`});html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Create New Group</div><div class="group-row"><input id="newGrpName" placeholder="Group name..." onkeydown="if(event.key==='Enter')createGroup()"><button onclick="createGroup()">Create</button></div>`;if(gn.length){html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Edit Group</div><div class="group-row"><select id="editGrpSel" style="flex:1;background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#e2e8f0;padding:5px;font-size:0.72rem" onchange="editingGroup=this.value;buildGroupMenu()"><option value="">Choose group...</option>${gn.map(g=>`<option value="${g}" ${editingGroup===g?'selected':''}>${g}</option>`).join('')}</select></div>`;if(editingGroup&&groups[editingGroup]){html+='<div class="group-sites">';ALL_SITES.forEach(s=>{html+=`<label><input type="checkbox" ${groups[editingGroup].includes(s.name)?'checked':''} onchange="togSiteGrp('${s.name}',this.checked)"> ${s.name}</label>`});html+='</div>'}}menu.innerHTML=html}
 function createGroup(){const inp=document.getElementById('newGrpName'),n=inp.value.trim();if(!n)return;const g=ldGrp();if(!g[n])g[n]=[];svGrp(g);inp.value='';editingGroup=n;buildGroupMenu()}
 function deleteGroup(n){const g=ldGrp();delete g[n];svGrp(g);if(editingGroup===n)editingGroup='';buildGroupMenu();applyFilters()}
 function togSiteGrp(name,checked){const g=ldGrp();if(!editingGroup||!g[editingGroup])return;if(checked&&!g[editingGroup].includes(name))g[editingGroup].push(name);if(!checked)g[editingGroup]=g[editingGroup].filter(n=>n!==name);svGrp(g);buildGroupMenu()}
 
-// ── Load data ────────────────────────────────────────────────
 loadAllSites();
-// Auto-refresh every 5 min without scroll reset
 setInterval(()=>{loadAllSites(true)},300000);
 
 async function loadAllSites(silent=false){
-    const promises=ALL_SITES.map(async site=>{
-        try{const r=await fetch(site.dataUrl);if(!r.ok)throw 0;return{...site,...(await r.json()),loaded:true}}
-        catch(e){return{...site,loaded:false,status:'offline',total_kwh:0,last_updated:null,today:{hourly_pv:new Array(24).fill(0),irradiation:new Array(24).fill(0)},hourly_pv:new Array(24).fill(0),stats_30day:{},history:{}}}
-    });
+    const promises=ALL_SITES.map(async site=>{try{const r=await fetch(site.dataUrl);if(!r.ok)throw 0;return{...site,...(await r.json()),loaded:true}}catch(e){return{...site,loaded:false,status:'offline',total_kwh:0,last_updated:null,today:{hourly_pv:new Array(24).fill(0),irradiation:new Array(24).fill(0)},hourly_pv:new Array(24).fill(0),stats_30day:{},history:{}}}});
     allSitesData=await Promise.all(promises);
     allSitesData.sort((a,b)=>{const o={offline:0,low:1,ok:2},d=(o[a.status]??2)-(o[b.status]??2);return d!==0?d:(b.total_kwh||0)-(a.total_kwh||0)});
     if(!silent)buildGroupMenu();
+    // Set date picker default
+    const dp=document.getElementById('datePicker');
+    if(!dp.value)dp.value=todaySAST();
     updateDashboard(silent);
 }
 
-// ── Dashboard ────────────────────────────────────────────────
-function updateDashboard(silent=false){
-    // Filter sites based on current platform/group/status selections
-    // (status filter excluded here so counts are correct)
-    const sitesInScope=allSitesData.filter(s=>{
-        if(!getSelPlatforms().includes(s.platform))return false;
-        const sg=getSelGroups();
-        if(sg.length>0){const ag=ldGrp();if(!sg.some(g=>(ag[g]||[]).includes(s.name)))return false}
-        return true;
-    });
+// Filters
+function getSelPlatforms(){return[...document.querySelectorAll('#platformMenu input:checked')].map(c=>c.value)}
+function getSelGroups(){return[...document.querySelectorAll('#groupMenu input[type=checkbox]:checked')].map(c=>c.value)}
+function siteInScope(site){if(!getSelPlatforms().includes(site.platform))return false;const sg=getSelGroups();if(sg.length>0){const ag=ldGrp();if(!sg.some(g=>(ag[g]||[]).includes(site.name)))return false}return true}
+function siteVisible(site){if(!siteInScope(site))return false;if(statusFilter){const stale=isStale(site),st=site.status||'offline';const isOff=stale||st==='offline'||!site.loaded;if(statusFilter==='offline'&&!isOff)return false;if(statusFilter==='low'&&(stale||st!=='low'))return false;if(statusFilter==='ok'&&(stale||st!=='ok'))return false}return true}
+function applyFilters(){document.querySelector('#platformDrop .dropdown-toggle').classList.toggle('has-sel',getSelPlatforms().length<3);document.querySelector('#groupDrop .dropdown-toggle').classList.toggle('has-sel',getSelGroups().length>0);updateDashboard()}
+function clearAllFilters(){statusFilter=null;document.querySelectorAll('#platformMenu input').forEach(c=>c.checked=true);document.querySelectorAll('#groupMenu input[type=checkbox]').forEach(c=>c.checked=false);document.querySelector('#platformDrop .dropdown-toggle').classList.remove('has-sel');document.querySelector('#groupDrop .dropdown-toggle').classList.remove('has-sel');updateDashboard()}
+function toggleStatus(st){statusFilter=statusFilter===st?null:st;updateDashboard()}
 
-    // Fleet total counts only sites in scope + not stale
-    const tot=sitesInScope.filter(s=>!isStale(s)).reduce((s,d)=>s+(d.total_kwh||0),0);
+// Date navigation
+function dateBack(){const dp=document.getElementById('datePicker');const d=new Date(dp.value);d.setDate(d.getDate()-1);dp.value=d.toISOString().slice(0,10);goToDate(dp.value)}
+function dateForward(){const dp=document.getElementById('datePicker');const d=new Date(dp.value);d.setDate(d.getDate()+1);const today=todaySAST();dp.value=d.toISOString().slice(0,10);if(dp.value>today)dp.value=today;goToDate(dp.value)}
+function goToDate(dateStr){viewDate=dateStr===todaySAST()?null:dateStr;renderCards()}
+
+function updateDashboard(silent=false){
+    const scope=allSitesData.filter(s=>siteInScope(s));
+    const fresh=scope.filter(s=>!isStale(s));
+    const tot=fresh.reduce((s,d)=>s+(d.total_kwh||0),0);
     let yFull=0,yByHour=0;
-    sitesInScope.forEach(s=>{const y=getYesterday(s);yFull+=y.full;yByHour+=y.byHour});
+    scope.forEach(s=>{const y=getYesterday(s);yFull+=y.full;yByHour+=y.byHour});
     document.getElementById('fleetTotal').innerHTML=`${fmt(tot,1)} <span>kWh</span>`;
     document.getElementById('yestVal').textContent=`${fmtI(yFull)} kWh`;
     document.getElementById('yestByHourVal').textContent=`${fmtI(yByHour)} kWh`;
+    // % of yesterday by hour
+    const genPct=yByHour>0?Math.round((tot/yByHour)*100):0;
+    const genPctEl=document.getElementById('genPct');
+    genPctEl.textContent=`${genPct}%`;
+    genPctEl.style.color=genPct>=85?'#22c55e':genPct>=50?'#eab308':'#fb923c';
 
-    // Irradiation TOTALS summed across sites in scope, cumulative to last_hour
-    // Compared with yesterday's irradiation up to the same hour.
     let todayIrr=0,yestIrr=0;
-    sitesInScope.forEach(s=>{
-        if(isStale(s))return;
-        const lh=s.last_hour||0;
-        todayIrr+=getIr(s).slice(0,lh+1).reduce((a,b)=>a+b,0);
-        const h=s.history||{},dates=Object.keys(h).sort();
-        if(dates.length>=2){
-            yestIrr+=(h[dates[dates.length-2]]?.irradiation||[]).slice(0,lh+1).reduce((a,b)=>a+b,0);
-        }
-    });
+    fresh.forEach(s=>{const lh=s.last_hour||0;todayIrr+=getIr(s).slice(0,lh+1).reduce((a,b)=>a+b,0);const h=s.history||{},dates=Object.keys(h).sort();if(dates.length>=2)yestIrr+=(h[dates[dates.length-2]]?.irradiation||[]).slice(0,lh+1).reduce((a,b)=>a+b,0)});
     const irrPct=yestIrr>0?Math.round((todayIrr/yestIrr)*100):0;
     const irrColor=irrPct>=85?'#22c55e':irrPct>=60?'#eab308':'#fb923c';
     document.getElementById('todayIrrVal').textContent=`${fmtI(todayIrr)} W/m²`;
     document.getElementById('yestIrrVal').textContent=`${fmtI(yestIrr)} W/m²`;
     document.getElementById('irrPctLabel').innerHTML=`Today / Yesterday irradiation · <span style="color:${irrColor};font-weight:700">${irrPct}%</span>`;
 
-    // Status counts respect scope too
-    const ok=sitesInScope.filter(s=>!isStale(s)&&s.status==='ok').length;
-    const lo=sitesInScope.filter(s=>!isStale(s)&&s.status==='low').length;
-    const off=sitesInScope.filter(s=>isStale(s)||s.status==='offline'||!s.loaded).length;
+    const ok=scope.filter(s=>!isStale(s)&&s.status==='ok').length,lo=scope.filter(s=>!isStale(s)&&s.status==='low').length,off=scope.filter(s=>isStale(s)||s.status==='offline'||!s.loaded).length;
     let bh='';
     if(ok)bh+=`<div class="fleet-badge ok-b${statusFilter==='ok'?' active':''}" onclick="toggleStatus('ok')"><div class="bd"></div><div class="bc">${ok} OK</div></div>`;
     if(lo)bh+=`<div class="fleet-badge low-b${statusFilter==='low'?' active':''}" onclick="toggleStatus('low')"><div class="bd"></div><div class="bc">${lo} Low</div></div>`;
     if(off)bh+=`<div class="fleet-badge off-b${statusFilter==='offline'?' active':''}" onclick="toggleStatus('offline')"><div class="bd"></div><div class="bc">${off} Offline</div></div>`;
     document.getElementById('statusBadges').innerHTML=bh;
-    const latest=allSitesData.filter(s=>s.last_updated).map(s=>s.last_updated).sort().reverse()[0]||'N/A';
-    document.getElementById('lastUpdated').textContent=`Updated ${latest}`;
+    document.getElementById('lastUpdated').textContent=`Updated ${allSitesData.filter(s=>s.last_updated).map(s=>s.last_updated).sort().reverse()[0]||'N/A'}`;
     updateLegend();
-    // Preserve scroll on silent refresh
     const scrollY=silent?window.scrollY:0;
     renderCards();
     if(silent)window.scrollTo(0,scrollY);
@@ -357,55 +296,12 @@ function updateDashboard(silent=false){
 function updateLegend(){
     const lb=document.getElementById('legendBar');
     if(currentMode==='today'){
-        lb.innerHTML=`
-            <div class="legend-item"><div class="legend-swatch" style="background:#22c55e"></div>PV Generation</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:#eab308;height:0;border-top:2px dotted #eab308"></div>Today Irradiation</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:rgba(234,179,8,0.3)"></div>Avg Irradiation</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:rgba(96,165,250,0.6);height:0;border-top:2px dashed rgba(96,165,250,0.6)"></div>30-Day Avg PV</div>`;
+        lb.innerHTML=`<div class="legend-item"><div class="legend-swatch" style="background:#22c55e"></div>PV Generation</div><div class="legend-item"><div class="legend-swatch" style="background:#eab308;height:0;border-top:2px dotted #eab308"></div>Today Irradiation</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(234,179,8,0.25)"></div>Avg Irradiation</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(96,165,250,0.6);height:0;border-top:2px dashed rgba(96,165,250,0.6)"></div>30-Day Avg PV</div>`;
     } else {
-        lb.innerHTML=`
-            <div class="legend-item"><div class="legend-swatch" style="background:#22c55e;height:0;border-top:2px dashed #22c55e"></div>Today</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:#60a5fa;height:0;border-top:2px dashed #60a5fa"></div>Median</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:rgba(34,197,94,0.3)"></div>P25-P75</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:rgba(180,140,60,0.7);height:0;border-top:1px solid rgba(180,140,60,0.7)"></div>Min</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:rgba(150,100,220,0.7);height:0;border-top:1px solid rgba(150,100,220,0.7)"></div>Max</div>`;
+        lb.innerHTML=`<div class="legend-item"><div class="legend-swatch" style="background:#22c55e;height:2px"></div>Today PV</div><div class="legend-item"><div class="legend-swatch" style="background:#60a5fa;height:0;border-top:2px dashed #60a5fa"></div>Median</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(34,197,94,0.3)"></div>P25-P75</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(180,140,60,0.7);height:0;border-top:1px solid rgba(180,140,60,0.7)"></div>Min</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(150,100,220,0.7);height:0;border-top:1px solid rgba(150,100,220,0.7)"></div>Max</div>`;
     }
 }
 
-function toggleStatus(st){statusFilter=statusFilter===st?null:st;updateDashboard()}
-
-// ── Filters ──────────────────────────────────────────────────
-function getSelPlatforms(){return[...document.querySelectorAll('#platformMenu input:checked')].map(c=>c.value)}
-function getSelGroups(){return[...document.querySelectorAll('#groupMenu input[type=checkbox]:checked')].map(c=>c.value)}
-function siteVisible(site){
-    if(!getSelPlatforms().includes(site.platform))return false;
-    const sg=getSelGroups();
-    if(sg.length>0){const ag=ldGrp();if(!sg.some(g=>(ag[g]||[]).includes(site.name)))return false}
-    if(statusFilter){
-        const stale=isStale(site);
-        const st=site.status||'offline';
-        const isOff=stale||st==='offline'||!site.loaded;
-        if(statusFilter==='offline'&&!isOff)return false;
-        if(statusFilter==='low'&&(stale||st!=='low'))return false;
-        if(statusFilter==='ok'&&(stale||st!=='ok'))return false;
-    }
-    return true;
-}
-function applyFilters(){
-    document.querySelector('#platformDrop .dropdown-toggle').classList.toggle('has-sel',getSelPlatforms().length<3);
-    document.querySelector('#groupDrop .dropdown-toggle').classList.toggle('has-sel',getSelGroups().length>0);
-    updateDashboard();
-}
-function clearAllFilters(btn){
-    statusFilter=null;
-    document.querySelectorAll('#platformMenu input').forEach(c=>c.checked=true);
-    document.querySelectorAll('#groupMenu input[type=checkbox]').forEach(c=>c.checked=false);
-    document.querySelector('#platformDrop .dropdown-toggle').classList.remove('has-sel');
-    document.querySelector('#groupDrop .dropdown-toggle').classList.remove('has-sel');
-    updateDashboard();
-}
-
-// ── Render cards ─────────────────────────────────────────────
 function renderCards(){
     const c=document.getElementById('sitesContainer');c.innerHTML='';
     allSitesData.forEach(s=>{const card=createCard(s);if(!siteVisible(s))card.classList.add('hidden');c.appendChild(card)});
@@ -414,78 +310,114 @@ function renderCards(){
 
 function createCard(site){
     const card=document.createElement('div');card.className='site-card';
-    card.onclick=()=>window.open(site.dashboardUrl,'_blank');
     const cid=`c-${site.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`;
-    const stale=isStale(site);
-    const kwh=site.total_kwh||0;
-    // If data is stale (not today), override status to 'offline' for display
+    const stale=isStale(site);const kwh=site.total_kwh||0;
     const st=stale?'offline':(site.status||'offline');
     const stL=stale?'STALE':st==='offline'?'OFFLINE':st==='low'?'LOW':'OK';
     const pl={fusionsolar:'FusionSolar',goodwe:'GoodWe',sunsynk:'Sunsynk'}[site.platform]||'';
-    // Hide stats when stale — they'd be misleading
     const ap=stale?null:calcAvgPct(site),apS=ap!==null?ap+'%':'--',apC=ap===null?'':ap>=70?'good':ap>=40?'warn':'bad';
     const ip=stale?null:calcIrradPct(site),ipS=ip!==null?ip+'%':'--';
-    // Show the date if it's stale so user knows how old the data is
-    const dateNote=stale&&site.date?` <span style="color:#ef4444;font-size:0.55rem;font-weight:700">${site.date}</span>`:'';
-    card.innerHTML=`<div class="site-topbar"><div class="site-topbar-left">
-        <div class="sn">${site.name}</div><div class="si ${st}"></div><span class="sp ${site.platform}">${pl}</span>
-        <div class="skwh">${fmt(kwh,1)} <i>kWh</i></div><div class="sl ${st}">${stL}</div>${dateNote}
-    </div><div class="site-badges">
-        <div class="sb ${apC}">${apS} of avg</div>
-        <div class="sb irr">${ipS} irrad</div>
-    </div></div>
-    <div class="site-chart-wrapper"><div class="site-chart-container"><canvas id="${cid}"></canvas></div></div>`;
+    const dateNote=stale&&site.date?`<span style="color:#ef4444;font-size:0.5rem;font-weight:700;margin-left:4px">${site.date}</span>`:'';
+    // Per-card mode
+    const cardMode=cardOverrides[cid]||currentMode;
+    const toggleLabel=cardMode==='today'?'30D':'T';
+    const toggleTitle=cardMode==='today'?'Switch to 30-Day Avg':'Switch to Today';
+
+    card.innerHTML=`
+        <div class="site-topbar">
+            <div class="site-row1">
+                <div class="site-row1-left">
+                    <div class="sn">${site.name}</div>
+                    <div class="si ${st}"></div>
+                    <span class="sp ${site.platform}">${pl}</span>
+                </div>
+                <div class="site-badges">
+                    <div class="sb ${apC}">${apS} of avg</div>
+                    <div class="sb irr">${ipS} irrad</div>
+                </div>
+            </div>
+            <div class="site-row2">
+                <div style="display:flex;align-items:center;gap:5px">
+                    <div class="skwh">${fmt(kwh,1)} <i>kWh</i></div>
+                    <div class="sl ${st}">${stL}</div>${dateNote}
+                </div>
+            </div>
+        </div>
+        <div class="site-chart-wrapper">
+            <button class="card-toggle" onclick="event.stopPropagation();toggleCard('${cid}')" title="${toggleTitle}">${toggleLabel}</button>
+            <div class="site-chart-container"><canvas id="${cid}"></canvas></div>
+        </div>`;
+    card.onclick=(e)=>{if(!e.target.closest('.card-toggle'))window.open(site.dashboardUrl,'_blank')};
     return card;
 }
 
-// ── Charts ───────────────────────────────────────────────────
+function toggleCard(cid){
+    const cur=cardOverrides[cid]||currentMode;
+    cardOverrides[cid]=cur==='today'?'average':'today';
+    const site=allSitesData.find(s=>`c-${s.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`===cid);
+    if(site)renderChart(site);
+    // Update button label
+    const btn=document.querySelector(`#${CSS.escape(cid)}`);
+    if(btn){const wrap=btn.closest('.site-chart-wrapper');if(wrap){const tb=wrap.querySelector('.card-toggle');if(tb){const m=cardOverrides[cid]||currentMode;tb.textContent=m==='today'?'30D':'T';tb.title=m==='today'?'Switch to 30-Day Avg':'Switch to Today'}}}
+}
+
 function trunc(arr){let l=0;for(let i=arr.length-1;i>=0;i--){if(arr[i]>0){l=i;break}}return arr.map((v,i)=>i<=l?v:null)}
 
 function renderChart(site){
     const cid=`c-${site.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`;
     const canvas=document.getElementById(cid);if(!canvas)return;
     const ctx=canvas.getContext('2d');
-    const pv=sliceHours(getPv(site)),stats=site.stats_30day||{},ir=sliceHours(getIr(site));
-    const avgIr=sliceHours(stats.hourly_irrad_avg||new Array(24).fill(0));
+    const stats=site.stats_30day||{};
     if(siteCharts[cid])siteCharts[cid].destroy();
 
-    if(currentMode==='today'){
-        const maxPv=Math.max(...pv,...sliceHours(stats.hourly_avg||new Array(24).fill(0)),1);
+    // Check if viewing a past date
+    let pv,ir;
+    if(viewDate){
+        const hd=getHistDate(site,viewDate);
+        pv=slH(hd?hd.hourly:new Array(24).fill(0));
+        ir=slH(hd?hd.irradiation:new Array(24).fill(0));
+    } else {
+        pv=slH(getPv(site));
+        ir=slH(getIr(site));
+    }
+    const avgIr=slH(stats.hourly_irrad_avg||new Array(24).fill(0));
+
+    const mode=cardOverrides[cid]||currentMode;
+
+    if(mode==='today'){
         const maxIr=Math.max(...ir,...avgIr,1);
         const y1Max=maxIr/0.7;
         siteCharts[cid]=new Chart(ctx,{type:'bar',data:{labels:CHART_LABELS,datasets:[
-            // Avg irradiation area (filled, behind everything)
-            {type:'line',data:avgIr,backgroundColor:'rgba(234,179,8,0.12)',borderColor:'rgba(234,179,8,0.3)',borderWidth:0.5,fill:true,yAxisID:'y1',pointRadius:0,tension:0.4,order:4},
-            // Today irradiation dotted line
+            {type:'line',data:avgIr,backgroundColor:'rgba(234,179,8,0.12)',borderColor:'rgba(234,179,8,0.25)',borderWidth:0.5,fill:true,yAxisID:'y1',pointRadius:0,tension:0.4,order:4},
             {type:'line',data:ir,borderColor:'#eab308',borderWidth:1.5,borderDash:[4,3],fill:false,yAxisID:'y1',pointRadius:0,tension:0.4,order:3},
-            // 30-day avg PV dashed
-            {type:'line',data:sliceHours(stats.hourly_avg||new Array(24).fill(0)),borderColor:'rgba(96,165,250,0.6)',borderWidth:1,borderDash:[3,2],fill:false,pointRadius:0,tension:0.4,order:1},
-            // PV bars
+            {type:'line',data:slH(stats.hourly_avg||new Array(24).fill(0)),borderColor:'rgba(96,165,250,0.6)',borderWidth:1,borderDash:[3,2],fill:false,pointRadius:0,tension:0.4,order:1},
             {type:'bar',data:pv,backgroundColor:'#22c55e',borderWidth:0,barPercentage:0.8,categoryPercentage:0.9,order:2}
-        ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{
-            x:{grid:{color:'rgba(148,163,184,0.06)',drawBorder:false},ticks:{color:'#4b5563',font:{size:8},maxTicksLimit:8}},
-            y:{beginAtZero:true,grid:{color:'rgba(148,163,184,0.06)',drawBorder:false},ticks:{color:'#4b5563',font:{size:8},maxTicksLimit:4}},
-            y1:{beginAtZero:true,position:'right',display:false,grid:{drawOnChartArea:false},max:y1Max}
-        }}});
+        ]},options:chartOpts('y1',y1Max)});
     } else {
         siteCharts[cid]=new Chart(ctx,{type:'bar',data:{labels:CHART_LABELS,datasets:[
-            {type:'line',data:sliceHours(stats.hourly_min||new Array(24).fill(0)),backgroundColor:'rgba(120,80,40,0.10)',borderColor:'rgba(180,140,60,0.7)',borderWidth:1,fill:'+1',pointRadius:0,tension:0.4,order:6},
-            {type:'line',data:sliceHours(stats.hourly_max||new Array(24).fill(0)),backgroundColor:'transparent',borderColor:'rgba(150,100,220,0.7)',borderWidth:1,pointRadius:0,tension:0.4,order:6},
-            {type:'line',data:sliceHours(stats.hourly_p25||new Array(24).fill(0)),backgroundColor:'rgba(34,197,94,0.18)',borderColor:'rgba(34,197,94,0.4)',borderWidth:0.5,fill:'+1',pointRadius:0,tension:0.4,order:4},
-            {type:'line',data:sliceHours(stats.hourly_p75||new Array(24).fill(0)),backgroundColor:'transparent',borderColor:'rgba(34,197,94,0.4)',borderWidth:0.5,pointRadius:0,tension:0.4,order:4},
-            {type:'line',data:sliceHours(stats.hourly_avg||new Array(24).fill(0)),borderColor:'#60a5fa',borderWidth:1.5,borderDash:[4,3],fill:false,pointRadius:0,tension:0.4,order:2},
-            {type:'line',data:trunc(pv),borderColor:'#22c55e',borderWidth:1.5,borderDash:[4,2],fill:false,pointRadius:0,tension:0.4,order:1}
-        ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{
-            x:{grid:{color:'rgba(148,163,184,0.06)',drawBorder:false},ticks:{color:'#4b5563',font:{size:8},maxTicksLimit:8}},
-            y:{beginAtZero:true,grid:{color:'rgba(148,163,184,0.06)',drawBorder:false},ticks:{color:'#4b5563',font:{size:8},maxTicksLimit:4}}
-        }}});
+            {type:'line',data:slH(stats.hourly_min||new Array(24).fill(0)),backgroundColor:'rgba(120,80,40,0.10)',borderColor:'rgba(180,140,60,0.7)',borderWidth:1,fill:'+1',pointRadius:0,tension:0.4,order:6},
+            {type:'line',data:slH(stats.hourly_max||new Array(24).fill(0)),backgroundColor:'transparent',borderColor:'rgba(150,100,220,0.7)',borderWidth:1,pointRadius:0,tension:0.4,order:6},
+            {type:'line',data:slH(stats.hourly_p25||new Array(24).fill(0)),backgroundColor:'rgba(34,197,94,0.18)',borderColor:'rgba(34,197,94,0.4)',borderWidth:0.5,fill:'+1',pointRadius:0,tension:0.4,order:4},
+            {type:'line',data:slH(stats.hourly_p75||new Array(24).fill(0)),backgroundColor:'transparent',borderColor:'rgba(34,197,94,0.4)',borderWidth:0.5,pointRadius:0,tension:0.4,order:4},
+            {type:'line',data:slH(stats.hourly_avg||new Array(24).fill(0)),borderColor:'#60a5fa',borderWidth:1.5,borderDash:[4,3],fill:false,pointRadius:0,tension:0.4,order:2},
+            // Today PV as SOLID green line (not dashed)
+            {type:'line',data:trunc(pv),borderColor:'#22c55e',borderWidth:2,fill:false,pointRadius:0,tension:0.4,order:1}
+        ]},options:chartOpts()});
     }
 }
 
-// ── Dropdowns & mode ─────────────────────────────────────────
+function chartOpts(y1Id,y1Max){
+    const o={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{
+        x:{grid:{color:'rgba(148,163,184,0.06)',drawBorder:false},ticks:{color:'#4b5563',font:{size:8},maxTicksLimit:8}},
+        y:{beginAtZero:true,grid:{color:'rgba(148,163,184,0.06)',drawBorder:false},ticks:{color:'#4b5563',font:{size:8},maxTicksLimit:4}}}};
+    if(y1Id)o.scales.y1={beginAtZero:true,position:'right',display:false,grid:{drawOnChartArea:false},max:y1Max};
+    return o;
+}
+
+function switchMode(m){currentMode=m;cardOverrides={};document.getElementById('modeToday').classList.toggle('active',m==='today');document.getElementById('modeAvg').classList.toggle('active',m==='average');updateLegend();renderCards()}
+
 function toggleDrop(id){document.querySelectorAll('.dropdown-menu').forEach(m=>{if(m.id!==id)m.classList.remove('show')});document.getElementById(id).classList.toggle('show');if(id==='groupMenu')buildGroupMenu()}
 document.addEventListener('click',e=>{if(!e.target.closest('.dropdown'))document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('show'))});
-function switchMode(m){currentMode=m;document.getElementById('modeToday').classList.toggle('active',m==='today');document.getElementById('modeAvg').classList.toggle('active',m==='average');updateLegend();renderCards()}
 </script>
 </body>
 </html>
