@@ -188,6 +188,8 @@ const ALL_SITES=[
 {name:"Addo Spar",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/addo-spar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/addo-spar/`},
 {name:"Kirkwood FNB",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-fnb/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-fnb/`},
 {name:"Kirkwood Spar",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-spar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-spar/`},
+{name:"BIMBO NRG",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bimbo-nrg/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bimbo-nrg/`},
+{name:"GM-Hasty Tasty",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/gm-hasty-tasty/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/gm-hasty-tasty/`},
 {name:"Aurora",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/aurora/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/aurora/`},
 {name:"BMI Isuzu",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/bmi-isuzu/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/bmi-isuzu/`},
 {name:"WG Bloomingdales",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-bloomingdales/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-bloomingdales/`},
@@ -198,6 +200,12 @@ const ALL_SITES=[
 {name:"WG Heritage Mall",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-heritage-mall/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-heritage-mall/`},
 {name:"WG Wellington Square",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-wellington-square/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-wellington-square/`},
 {name:"Kirkwood Tops",platform:"sunsynk",dataUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-tops/data/processed.json`,dashboardUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-tops/`},
+
+// ── Standalone sites (custom format) ────────────────────────
+{name:"1st Avenue Spar",platform:"fusionsolar",format:"1stavespar",
+    dataUrl:`${BASE}/1stAveSpar/data/today_detailed.json`,
+    metaUrl:`${BASE}/1stAveSpar/data/last_scrape.json`,
+    dashboardUrl:`${BASE}/1stAveSpar/`},
 ];
 
 const HOUR_START=5,HOUR_END=21;
@@ -214,6 +222,45 @@ function getPv(s){return(s.today&&s.today.hourly_pv)||s.hourly_pv||new Array(24)
 function getIr(s){return(s.today&&s.today.irradiation)||s.irradiation||new Array(24).fill(0)}
 function todaySAST(){const n=new Date();const s=new Date(n.getTime()+(2*60-n.getTimezoneOffset())*60000);return s.toISOString().slice(0,10)}
 function isStale(site){if(!site.loaded||!site.date)return true;return site.date!==todaySAST()}
+
+// Normalize 1st Avenue Spar's today_detailed.json into standard format
+function normalize1stAve(hourlyArr, meta, site){
+    const pv=new Array(24).fill(0);
+    const ir=new Array(24).fill(0);
+    const avgPv=new Array(24).fill(0);
+    if(Array.isArray(hourlyArr)){
+        hourlyArr.forEach(h=>{
+            const hr=h.hour||0;
+            if(hr>=0&&hr<24){
+                pv[hr]=h.pv_kw||0;
+                ir[hr]=h.irradiation_wm2||0;
+                avgPv[hr]=h.predicted_kw||0;
+            }
+        });
+    }
+    const total=pv.reduce((a,b)=>a+b,0);
+    let lastHour=0;
+    for(let i=23;i>=0;i--){if(pv[i]>0){lastHour=i;break}}
+    const date=meta?.date||todaySAST();
+    return{
+        ...site, loaded:true,
+        plant:'1st Avenue Spar',
+        last_updated:meta?.timestamp||'N/A',
+        date:date,
+        total_kwh:Math.round(total*10)/10,
+        last_hour:lastHour,
+        status:total>0?'ok':'offline',
+        alerts:{offline:total<=0,pace_low:false,total_low:false},
+        today:{hourly_pv:pv,irradiation:ir},
+        hourly_pv:pv,
+        irradiation:ir,
+        stats_30day:{hourly_avg:avgPv,hourly_min:new Array(24).fill(0),hourly_max:new Array(24).fill(0),
+            hourly_p10:new Array(24).fill(0),hourly_p25:new Array(24).fill(0),hourly_p75:new Array(24).fill(0),hourly_p90:new Array(24).fill(0),
+            hourly_irrad_avg:ir, // use today's irrad as avg approximation
+            daily_min:0,daily_max:0,daily_avg:avgPv.reduce((a,b)=>a+b,0),sample_days:1},
+        history:{[date]:{total_kwh:total,hourly:pv,irradiation:ir,last_hour:lastHour}},
+    };
+}
 function calcAvgPct(site){const s=site.stats_30day||{},ha=s.hourly_avg||[];const lh=site.last_hour||0;if(lh<HOUR_START||!ha.length)return null;const e=ha.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);if(e<1)return null;return Math.round(getPv(site).slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0)/e*100)}
 function calcIrradPct(site){const ir=getIr(site),s=site.stats_30day||{},avg=s.hourly_irrad_avg||[];const lh=site.last_hour||0;if(lh<HOUR_START||!avg.length)return null;const tC=ir.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0),aC=avg.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);if(aC<10)return null;return Math.round((tC/aC)*100)}
 function getYesterday(site){const h=site.history||{},d=Object.keys(h).sort();if(d.length<2)return{full:0,byHour:0};const yd=d[d.length-2],yD=h[yd]||{};const lh=site.last_hour||0;return{full:yD.total_kwh||0,byHour:(yD.hourly||new Array(24).fill(0)).slice(0,lh+1).reduce((a,b)=>a+b,0)}}
@@ -233,7 +280,16 @@ loadAllSites();
 setInterval(()=>{loadAllSites(true)},300000);
 
 async function loadAllSites(silent=false){
-    const promises=ALL_SITES.map(async site=>{try{const r=await fetch(site.dataUrl);if(!r.ok)throw 0;return{...site,...(await r.json()),loaded:true}}catch(e){return{...site,loaded:false,status:'offline',total_kwh:0,last_updated:null,today:{hourly_pv:new Array(24).fill(0),irradiation:new Array(24).fill(0)},hourly_pv:new Array(24).fill(0),stats_30day:{},history:{}}}});
+    const promises=ALL_SITES.map(async site=>{
+        try{
+            if(site.format==='1stavespar'){
+                const[hR,mR]=await Promise.all([fetch(site.dataUrl),fetch(site.metaUrl)]);
+                if(!hR.ok)throw 0;
+                return normalize1stAve(await hR.json(),mR.ok?await mR.json():null,site);
+            }
+            const r=await fetch(site.dataUrl);if(!r.ok)throw 0;return{...site,...(await r.json()),loaded:true};
+        }catch(e){return{...site,loaded:false,status:'offline',total_kwh:0,last_updated:null,today:{hourly_pv:new Array(24).fill(0),irradiation:new Array(24).fill(0)},hourly_pv:new Array(24).fill(0),stats_30day:{},history:{}}}
+    });
     allSitesData=await Promise.all(promises);
     allSitesData.sort((a,b)=>{const o={offline:0,low:1,ok:2},d=(o[a.status]??2)-(o[b.status]??2);return d!==0?d:(b.total_kwh||0)-(a.total_kwh||0)});
     if(!silent)buildGroupMenu();
@@ -477,4 +533,4 @@ function toggleDrop(id){document.querySelectorAll('.dropdown-menu').forEach(m=>{
 document.addEventListener('click',e=>{if(!e.target.closest('.dropdown'))document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('show'))});
 </script>
 </body>
-</html>
+    </html>
