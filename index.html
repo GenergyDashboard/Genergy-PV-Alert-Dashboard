@@ -9,9 +9,25 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;color:#e2e8f0;min-height:100vh;padding:16px}
 .container{max-width:100%;margin:0 auto;padding:0 4px}
-.header{text-align:center;margin-bottom:18px}
+.header{text-align:center;margin-bottom:18px;position:relative}
 .header h1{font-size:1.6rem;margin-bottom:4px;color:#fff;font-weight:500}
 .last-updated{color:#64748b;font-size:0.75rem}
+.user-bar{position:absolute;top:0;right:0;display:flex;gap:8px;align-items:center}
+.user-badge{font-size:0.65rem;color:#9ca3af;background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:3px 10px}
+.user-badge strong{color:#60a5fa}
+.logout-btn{font-size:0.6rem;color:#ef4444;cursor:pointer;background:none;border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:2px 8px}
+.logout-btn:hover{background:rgba(239,68,68,0.15)}
+/* Login overlay */
+.login-overlay{position:fixed;inset:0;background:rgba(10,14,20,0.97);z-index:1000;display:flex;align-items:center;justify-content:center}
+.login-box{background:linear-gradient(135deg,#1a2332,#1e2936);border-radius:16px;padding:40px;max-width:360px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.08)}
+.login-box h2{color:#fff;font-size:1.4rem;margin-bottom:6px;text-align:center}
+.login-box .sub{color:#64748b;font-size:0.75rem;text-align:center;margin-bottom:24px}
+.login-box input{width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(15,20,25,0.6);color:#e2e8f0;font-size:0.85rem;margin-bottom:12px}
+.login-box input:focus{outline:none;border-color:#3b82f6}
+.login-box button{width:100%;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-weight:600;cursor:pointer;font-size:0.9rem}
+.login-box button:hover{opacity:0.9}
+.login-err{color:#ef4444;font-size:0.72rem;text-align:center;margin-top:8px;min-height:18px}
+/* Fleet */
 .fleet-summary{background:linear-gradient(135deg,#1a2332,#1e2936);border-radius:14px;padding:22px;margin-bottom:14px;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
 .fleet-top{display:flex;align-items:flex-end;justify-content:center;gap:32px;margin-bottom:4px}
 .fleet-side{text-align:right;padding-bottom:6px;min-width:120px}
@@ -36,10 +52,15 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 .ok-b .bd{background:#22c55e;box-shadow:0 0 6px #22c55e}.low-b .bd{background:#fb923c;box-shadow:0 0 6px #fb923c}.off-b .bd{background:#6b7280;box-shadow:0 0 6px #6b7280}
 .bc{font-weight:700;font-size:0.8rem}
 .ok-b .bc{color:#22c55e}.low-b .bc{color:#fb923c}.off-b .bc{color:#6b7280}
+/* Controls */
 .controls{display:flex;justify-content:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
 .ctrl-btn{padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:rgba(15,20,25,0.4);color:#9ca3af;cursor:pointer;font-size:0.72rem;font-weight:500;transition:all 0.25s}
 .ctrl-btn:hover{background:rgba(59,130,246,0.2);border-color:#3b82f6;color:#60a5fa}
 .ctrl-btn.active{background:#3b82f6;border-color:#3b82f6;color:#fff}
+.ctrl-btn.map-btn{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.3);color:#22c55e}
+.ctrl-btn.map-btn:hover{background:rgba(34,197,94,0.3)}
+.ctrl-btn.rotate-active{background:rgba(168,85,247,0.2);border-color:#a855f7;color:#a855f7;animation:pulse-rotate 2s infinite}
+@keyframes pulse-rotate{0%,100%{box-shadow:0 0 0 0 rgba(168,85,247,0.3)}50%{box-shadow:0 0 8px 2px rgba(168,85,247,0.3)}}
 .dropdown{position:relative;display:inline-block}
 .dropdown-toggle{padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:rgba(15,20,25,0.4);color:#9ca3af;cursor:pointer;font-size:0.72rem;font-weight:500;transition:all 0.25s}
 .dropdown-toggle:hover{background:rgba(59,130,246,0.2);border-color:#3b82f6;color:#60a5fa}
@@ -56,23 +77,22 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 .group-row button{padding:5px 12px;border-radius:4px;border:none;background:#3b82f6;color:#fff;font-size:0.7rem;cursor:pointer;white-space:nowrap}
 .group-sites{max-height:200px;overflow-y:auto;padding:4px 14px}
 .group-sites label{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:0.7rem;color:#cbd5e1;cursor:pointer}
-.group-sites label:hover{color:#fff}
 .group-del{font-size:0.6rem;color:#ef4444;cursor:pointer;margin-left:auto;padding:2px 6px;border-radius:3px}
 .group-del:hover{background:rgba(239,68,68,0.2)}
-.legend-bar{display:flex;justify-content:center;gap:14px;margin-bottom:10px;flex-wrap:wrap}
-.legend-item{display:flex;align-items:center;gap:4px;font-size:0.65rem;color:#6b7280}
-.legend-swatch{width:16px;height:4px;border-radius:1px}
 /* Date nav */
 .date-nav{display:flex;align-items:center;gap:6px}
 .date-nav button{background:rgba(15,20,25,0.4);border:1px solid rgba(255,255,255,0.1);color:#9ca3af;border-radius:5px;padding:4px 8px;cursor:pointer;font-size:0.7rem;transition:all 0.2s}
 .date-nav button:hover{background:rgba(59,130,246,0.2);color:#60a5fa;border-color:#3b82f6}
 .date-nav input[type=date]{background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:5px;color:#e2e8f0;padding:4px 8px;font-size:0.68rem}
-/* Site cards */
-.sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:20px}
+.legend-bar{display:flex;justify-content:center;gap:14px;margin-bottom:10px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:0.65rem;color:#6b7280}
+.legend-swatch{width:16px;height:4px;border-radius:1px}
+/* Cards */
+.sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:20px;transition:opacity 0.5s}
+.sites-grid.fading{opacity:0.3}
 .site-card{background:linear-gradient(135deg,#1a2332,#1e2936);border-radius:12px;box-shadow:0 3px 12px rgba(0,0,0,0.3);transition:all 0.3s;cursor:pointer;border:2px solid rgba(255,255,255,0.08);overflow:hidden;display:flex;flex-direction:column}
 .site-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.5);border-color:rgba(255,255,255,0.2)}
 .site-card.hidden{display:none}
-/* Two-row card header */
 .site-topbar{padding:10px 12px 4px}
 .site-row1{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:2px}
 .site-row1-left{display:flex;align-items:center;gap:5px;min-width:0}
@@ -91,12 +111,41 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 .site-badges{display:flex;flex-direction:column;gap:2px;align-items:flex-end;flex-shrink:0}
 .sb{font-size:0.62rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(255,255,255,.05);white-space:nowrap}
 .sb.good{color:#22c55e}.sb.warn{color:#fb923c}.sb.bad{color:#ef4444}.sb.irr{color:#eab308}
-/* Per-card toggle */
 .card-toggle{font-size:0.5rem;padding:2px 6px;border-radius:3px;border:1px solid rgba(255,255,255,0.1);background:rgba(15,20,25,0.4);color:#6b7280;cursor:pointer;transition:all 0.2s;position:absolute;top:6px;right:6px;z-index:10}
 .card-toggle:hover{color:#60a5fa;border-color:#3b82f6}
 .site-chart-wrapper{flex:1;min-height:160px;position:relative;padding:2px 6px 6px}
 .site-chart-container{position:absolute;top:0;left:6px;right:6px;bottom:6px}
-/* TV Scroll arrows */
+/* Map overlay */
+.map-overlay{position:fixed;inset:0;background:rgba(10,14,20,0.97);z-index:500;display:none;overflow-y:auto}
+.map-overlay.show{display:block}
+.map-container{max-width:900px;margin:0 auto;padding:20px;text-align:center}
+.map-container h2{color:#fff;font-size:1.5rem;margin-bottom:4px}
+.map-container .sub{color:#64748b;font-size:0.72rem;margin-bottom:20px}
+.map-close{position:fixed;top:16px;right:20px;color:#9ca3af;font-size:1.5rem;cursor:pointer;z-index:600;background:rgba(15,20,25,0.8);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15)}
+.map-close:hover{color:#fff;background:rgba(59,130,246,0.3)}
+.map-svg-wrap{position:relative;display:inline-block}
+.map-svg-wrap svg{max-width:100%;height:auto}
+.map-svg-wrap svg path.province{fill:rgba(30,41,54,0.9);stroke:rgba(255,255,255,0.6);stroke-width:1;transition:fill 0.3s}
+.map-svg-wrap svg path.province:hover{fill:rgba(40,55,75,0.9)}
+.map-svg-wrap svg text{fill:rgba(255,255,255,0.35);font-size:8px;font-family:'Segoe UI',sans-serif;pointer-events:none}
+/* Map dots */
+.map-dot{position:absolute;cursor:pointer;transform:translate(-50%,-50%);z-index:10}
+.map-dot-inner{width:14px;height:14px;border-radius:50%;position:relative;transition:all 0.3s}
+.map-dot-inner.ok{background:#22c55e;box-shadow:0 0 8px #22c55e,0 0 16px rgba(34,197,94,0.4)}
+.map-dot-inner.warn{background:#fb923c;box-shadow:0 0 8px #fb923c,0 0 16px rgba(251,146,60,0.4)}
+.map-dot-inner.error{background:#ef4444;box-shadow:0 0 8px #ef4444,0 0 16px rgba(239,68,68,0.4)}
+.map-dot-inner::before{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid currentColor;opacity:0.3;animation:map-pulse 2s infinite}
+@keyframes map-pulse{0%,100%{transform:scale(1);opacity:0.3}50%{transform:scale(1.3);opacity:0}}
+.map-dot:hover .map-dot-inner{transform:scale(1.3)}
+.map-dot-label{position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:0.55rem;color:#e2e8f0;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,0.8);pointer-events:none}
+.map-dot-count{font-size:0.5rem;color:#9ca3af}
+/* Map dropdown */
+.map-dropdown{position:absolute;background:#1a2332;border:1px solid rgba(255,255,255,0.15);border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,0.5);min-width:200px;z-index:20;padding:6px 0;display:none}
+.map-dropdown.show{display:block}
+.map-dropdown-item{padding:6px 14px;font-size:0.72rem;color:#cbd5e1;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background 0.15s}
+.map-dropdown-item:hover{background:rgba(59,130,246,0.15)}
+.map-dropdown-item .mdi{width:6px;height:6px;border-radius:50%}
+/* Scroll & refresh */
 .scroll-arrows{position:fixed;right:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:60}
 .scroll-arrow{width:36px;height:36px;border-radius:50%;background:rgba(30,41,54,0.9);border:1px solid rgba(255,255,255,0.15);color:#9ca3af;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all 0.2s;box-shadow:0 2px 10px rgba(0,0,0,0.3)}
 .scroll-arrow:hover{background:rgba(59,130,246,0.3);border-color:#3b82f6;color:#fff}
@@ -104,14 +153,60 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 .refresh-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(59,130,246,0.6)}
 .loading{text-align:center;padding:50px;font-size:1.1rem;color:#94a3b8}
 .footer-note{text-align:left;color:#64748b;font-size:0.65rem;margin-top:10px;padding-left:4px}
-@media(max-width:500px){.sites-grid{grid-template-columns:1fr}.fleet-top{flex-direction:column;align-items:center;gap:10px}.scroll-arrows{display:none}}
+@media(max-width:500px){.sites-grid{grid-template-columns:1fr}.fleet-top{flex-direction:column;align-items:center;gap:10px}.scroll-arrows{display:none}.user-bar{position:static;justify-content:center;margin-top:6px}}
 </style>
 </head>
 <body>
-<div class="container">
+<!-- Login overlay -->
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+        <h2>Genergy PV Dashboard</h2>
+        <div class="sub">Sign in to access fleet monitoring</div>
+        <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
+        <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+        <button onclick="doLogin()">Sign In</button>
+        <div class="login-err" id="loginErr"></div>
+    </div>
+</div>
+<!-- Map overlay -->
+<div class="map-overlay" id="mapOverlay">
+    <div class="map-close" onclick="closeMap()">✕</div>
+    <div class="map-container">
+        <h2>Site Map — South Africa</h2>
+        <div class="sub">Click a region to view sites</div>
+        <div class="map-svg-wrap" id="mapWrap">
+            <svg viewBox="0 0 600 520" xmlns="http://www.w3.org/2000/svg" id="saMap">
+                <!-- SA Provinces - simplified outlines -->
+                <path class="province" d="M55,350 L90,280 L130,250 L180,230 L210,250 L220,310 L250,350 L280,380 L260,420 L220,440 L170,460 L120,450 L80,420 L50,390Z" data-p="Western Cape"/>
+                <path class="province" d="M280,380 L250,350 L220,310 L210,250 L260,220 L310,200 L360,210 L400,250 L420,300 L440,350 L430,400 L390,430 L340,440 L300,420Z" data-p="Eastern Cape"/>
+                <path class="province" d="M130,250 L180,230 L210,250 L260,220 L310,200 L350,160 L310,120 L250,90 L190,70 L130,50 L80,80 L50,130 L55,200 L90,280Z" data-p="Northern Cape"/>
+                <path class="province" d="M310,200 L350,160 L370,120 L400,100 L430,120 L420,170 L400,200 L360,210Z" data-p="Free State"/>
+                <path class="province" d="M400,100 L430,120 L420,170 L440,160 L470,130 L480,100 L460,70 L430,60 L400,70Z" data-p="Gauteng"/>
+                <path class="province" d="M430,120 L420,170 L400,200 L360,210 L400,250 L420,300 L460,280 L500,240 L520,200 L510,160 L480,130 L470,130 L440,160Z" data-p="KwaZulu-Natal"/>
+                <path class="province" d="M370,120 L400,100 L400,70 L430,60 L440,40 L400,20 L350,30 L310,50 L310,120 L350,160Z" data-p="North West"/>
+                <path class="province" d="M430,60 L460,70 L480,100 L510,80 L530,50 L540,20 L500,10 L460,15 L440,40Z" data-p="Mpumalanga"/>
+                <path class="province" d="M440,40 L460,15 L500,10 L540,20 L550,50 L530,50 L510,80 L480,100 L470,130 L480,130 L510,160 L520,130 L540,100 L560,60 L550,30 L530,10 L480,5 L450,10Z" data-p="Limpopo"/>
+                <!-- Province labels -->
+                <text x="160" y="380">Western Cape</text>
+                <text x="330" y="340">Eastern Cape</text>
+                <text x="160" y="150">Northern Cape</text>
+                <text x="350" y="160">Free State</text>
+                <text x="445" y="100">Gauteng</text>
+                <text x="460" y="230">KwaZulu-Natal</text>
+                <text x="340" y="70">North West</text>
+                <text x="490" y="50">Mpumalanga</text>
+                <text x="500" y="15">Limpopo</text>
+            </svg>
+            <div id="mapDots"></div>
+        </div>
+    </div>
+</div>
+<!-- Main dashboard -->
+<div class="container" id="mainDash">
     <div class="header">
         <h1>Genergy — PV Fleet Dashboard</h1>
         <div class="last-updated" id="lastUpdated">Loading...</div>
+        <div class="user-bar" id="userBar"></div>
     </div>
     <div class="fleet-summary">
         <div class="fleet-top">
@@ -121,9 +216,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
                 <div class="fleet-side-pct" id="genPct" style="color:#6b7280">--%</div>
                 <div class="fleet-side-label">Yesterday (full / by hour)</div>
             </div>
-            <div class="fleet-today">
-                <div class="fleet-total" id="fleetTotal">0 <span>kWh</span></div>
-            </div>
+            <div class="fleet-today"><div class="fleet-total" id="fleetTotal">0 <span>kWh</span></div></div>
             <div class="fleet-side" style="text-align:left">
                 <div class="fleet-side-val" id="todayIrrVal" style="color:#eab308">--</div>
                 <div class="fleet-side-sub" id="yestIrrVal">--</div>
@@ -151,69 +244,158 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
         </div>
         <button class="ctrl-btn" onclick="clearAllFilters()">All</button>
         <span style="color:#374151">|</span>
-        <button class="ctrl-btn" id="modeToday" onclick="switchMode('today')">Today</button>
+        <button class="ctrl-btn" id="modeToday" onclick="switchMode('today')">Bar Graph</button>
         <button class="ctrl-btn active" id="modeAvg" onclick="switchMode('average')">30-Day Average</button>
+        <button class="ctrl-btn map-btn" onclick="openMap()">🗺 Map</button>
         <span style="color:#374151">|</span>
         <div class="date-nav">
             <button onclick="dateBack()" title="Previous day">◀</button>
             <input type="date" id="datePicker" onchange="goToDate(this.value)">
             <button onclick="dateForward()" title="Next day">▶</button>
+            <button onclick="goToToday()" style="background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.3);color:#22c55e" title="Jump to today">Today</button>
         </div>
+        <span style="color:#374151">|</span>
+        <button class="ctrl-btn" id="rotateBtn" onclick="toggleRotate()" title="Auto-rotate through groups every 15s">▶ Rotate</button>
     </div>
     <div class="legend-bar" id="legendBar"></div>
     <div id="sitesContainer" class="sites-grid"><div class="loading">Loading site data...</div></div>
     <div class="footer-note">Auto-refreshes every 5 min · Scrapers run 05:00–21:00 SAST</div>
     <button class="refresh-btn" onclick="loadAllSites()">🔄 Refresh</button>
 </div>
-<!-- TV scroll arrows -->
 <div class="scroll-arrows">
-    <button class="scroll-arrow" onclick="window.scrollBy({top:-400,behavior:'smooth'})" title="Scroll up">▲</button>
-    <button class="scroll-arrow" onclick="window.scrollBy({top:400,behavior:'smooth'})" title="Scroll down">▼</button>
+    <button class="scroll-arrow" onclick="window.scrollBy({top:-400,behavior:'smooth'})">▲</button>
+    <button class="scroll-arrow" onclick="window.scrollBy({top:400,behavior:'smooth'})">▼</button>
 </div>
 <script>
+// ── Auth (hashed passwords — loaded from auth.json) ─────────
+let AUTH_DATA=null; // loaded from data/auth.json
+let currentUser=null;
+
+async function sha256(message){
+    const msgBuffer=new TextEncoder().encode(message);
+    const hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);
+    return Array.from(new Uint8Array(hashBuffer)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function loadAuthData(){
+    try{
+        // Auth file sits alongside the dashboard
+        const r=await fetch('./data/auth.json');
+        if(!r.ok)throw new Error('auth.json not found');
+        AUTH_DATA=await r.json();
+        return true;
+    }catch(e){
+        console.error('Failed to load auth data:',e);
+        // Fallback: allow admin login with environment default
+        AUTH_DATA=null;
+        return false;
+    }
+}
+
+async function doLogin(){
+    const u=document.getElementById('loginUser').value.trim().toLowerCase();
+    const p=document.getElementById('loginPass').value;
+    const errEl=document.getElementById('loginErr');
+    errEl.textContent='Signing in...';
+
+    if(!AUTH_DATA)await loadAuthData();
+    if(!AUTH_DATA){errEl.textContent='Auth system unavailable';return}
+
+    const userData=AUTH_DATA[u];
+    if(!userData){errEl.textContent='Invalid username or password';return}
+
+    const inputHash=await sha256(p);
+    if(inputHash!==userData.hash){errEl.textContent='Invalid username or password';return}
+
+    currentUser={username:u,role:userData.role,display:userData.display};
+    localStorage.setItem('g_session',JSON.stringify({username:u}));
+    document.getElementById('loginOverlay').style.display='none';
+    errEl.textContent='';
+    renderUserBar();
+    loadAllSites();
+}
+
+function doLogout(){
+    localStorage.removeItem('g_session');
+    currentUser=null;
+    document.getElementById('loginOverlay').style.display='flex';
+    document.getElementById('loginUser').value='';
+    document.getElementById('loginPass').value='';
+}
+
+async function checkLogin(){
+    await loadAuthData();
+    try{
+        const s=localStorage.getItem('g_session');
+        if(s&&AUTH_DATA){
+            const session=JSON.parse(s);
+            const userData=AUTH_DATA[session.username];
+            if(userData){
+                currentUser={username:session.username,role:userData.role,display:userData.display};
+                document.getElementById('loginOverlay').style.display='none';
+                renderUserBar();
+                return true;
+            }
+        }
+    }catch(e){}
+    document.getElementById('loginOverlay').style.display='flex';
+    return false;
+}
+
+function renderUserBar(){
+    const bar=document.getElementById('userBar');
+    if(!currentUser){bar.innerHTML='';return}
+    bar.innerHTML=`<span class="user-badge">Signed in as <strong>${currentUser.display}</strong></span><button class="logout-btn" onclick="doLogout()">Sign Out</button>`;
+}
+function isAdmin(){return currentUser&&currentUser.role==='admin'}
+
+// ── Per-user settings (stored in localStorage under username key) ──
+function userKey(key){return currentUser?`g_${currentUser.username}_${key}`:`g_anon_${key}`}
+function ldGrp(){try{return JSON.parse(localStorage.getItem(userKey('groups')))||{}}catch(e){return{}}}
+function svGrp(g){localStorage.setItem(userKey('groups'),JSON.stringify(g))}
+
+// ── Site definitions ────────────────────────────────────────
 const BASE="https://genergydashboard.github.io";
 const ALL_SITES=[
-{name:"Bel Essex (Valeo)",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bel-essex-valeo/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bel-essex-valeo/`},
-{name:"BMI Park",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-park/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-park/`},
-{name:"BMI Paterson",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-paterson/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-paterson/`},
-{name:"Coega Dairy",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/coega-dairy/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/coega-dairy/`},
-{name:"Keypak Part 2",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/keypak-part-2/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/keypak-part-2/`},
-{name:"MP The Pines",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mp-the-pines/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mp-the-pines/`},
-{name:"Mountain View SC",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mountain-view-sc/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mountain-view-sc/`},
-{name:"Nautica Shopping Centre",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/nautica-sc/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/nautica-sc/`},
-{name:"RDM Somerset West 5MW",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/rdm-somerset-west/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/rdm-somerset-west/`},
-{name:"WG Nurture Health",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-nurture-health/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-nurture-health/`},
-{name:"Shoprite Parklands",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/shoprite-parklands/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/shoprite-parklands/`},
-{name:"WG Mdantsane SuperSpar",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-mdantsane-superspar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-mdantsane-superspar/`},
-{name:"Addo Spar",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/addo-spar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/addo-spar/`},
-{name:"Kirkwood FNB",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-fnb/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-fnb/`},
-{name:"Kirkwood Spar",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-spar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-spar/`},
-{name:"BIMBO NRG",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bimbo-nrg/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bimbo-nrg/`},
-{name:"GM-Hasty Tasty",platform:"fusionsolar",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/gm-hasty-tasty/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/gm-hasty-tasty/`},
-{name:"Aurora",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/aurora/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/aurora/`},
-{name:"BMI Isuzu",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/bmi-isuzu/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/bmi-isuzu/`},
-{name:"WG Bloomingdales",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-bloomingdales/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-bloomingdales/`},
-{name:"WG Circular Business Park",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-circular-business-park/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-circular-business-park/`},
-{name:"WG Cure Day Hospital",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-cure-day-hospital/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-cure-day-hospital/`},
-{name:"WG Debi Lee Spar",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-debi-lee-spar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-debi-lee-spar/`},
-{name:"WG Gonubie Mall",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-gonubie-mall/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-gonubie-mall/`},
-{name:"WG Heritage Mall",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-heritage-mall/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-heritage-mall/`},
-{name:"WG Wellington Square",platform:"goodwe",dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-wellington-square/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-wellington-square/`},
-{name:"Kirkwood Tops",platform:"sunsynk",dataUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-tops/data/processed.json`,dashboardUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-tops/`},
-
-// ── Standalone sites (custom format) ────────────────────────
-{name:"1st Avenue Spar",platform:"fusionsolar",format:"1stavespar",
+{name:"Addo Spar",platform:"fusionsolar",location:"Addo",province:"Eastern Cape",lat:-33.47,lon:25.75,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/addo-spar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/addo-spar/`},
+{name:"Bel Essex (Valeo)",platform:"fusionsolar",location:"Gqeberha",province:"Eastern Cape",lat:-33.78,lon:25.42,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bel-essex-valeo/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bel-essex-valeo/`},
+{name:"BIMBO NRG",platform:"fusionsolar",location:"Cape Town",province:"Western Cape",lat:-33.92,lon:18.66,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bimbo-nrg/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bimbo-nrg/`},
+{name:"BMI Park",platform:"fusionsolar",location:"Gqeberha",province:"Eastern Cape",lat:-33.92,lon:25.57,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-park/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-park/`},
+{name:"BMI Paterson",platform:"fusionsolar",location:"Paterson",province:"Eastern Cape",lat:-33.47,lon:26.16,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-paterson/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bmi-paterson/`},
+{name:"Coega Dairy",platform:"fusionsolar",location:"Gqeberha",province:"Eastern Cape",lat:-33.92,lon:25.60,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/coega-dairy/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/coega-dairy/`},
+{name:"GM-Hasty Tasty",platform:"fusionsolar",location:"Gqeberha",province:"Eastern Cape",lat:-33.95,lon:25.61,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/gm-hasty-tasty/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/gm-hasty-tasty/`},
+{name:"Keypak Part 2",platform:"fusionsolar",location:"Gqeberha",province:"Eastern Cape",lat:-33.87,lon:25.57,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/keypak-part-2/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/keypak-part-2/`},
+{name:"Kirkwood FNB",platform:"fusionsolar",location:"Kirkwood",province:"Eastern Cape",lat:-33.40,lon:25.44,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-fnb/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-fnb/`},
+{name:"Kirkwood Spar",platform:"fusionsolar",location:"Kirkwood",province:"Eastern Cape",lat:-33.40,lon:25.44,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-spar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/kirkwood-spar/`},
+{name:"MP The Pines",platform:"fusionsolar",location:"Cape Town",province:"Western Cape",lat:-33.92,lon:18.45,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mp-the-pines/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mp-the-pines/`},
+{name:"Mountain View SC",platform:"fusionsolar",location:"Gordon's Bay",province:"Western Cape",lat:-34.16,lon:18.86,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mountain-view-sc/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/mountain-view-sc/`},
+{name:"Nautica Shopping Centre",platform:"fusionsolar",location:"Langebaan",province:"Western Cape",lat:-33.04,lon:18.05,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/nautica-sc/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/nautica-sc/`},
+{name:"RDM Somerset West 5MW",platform:"fusionsolar",location:"Somerset West",province:"Western Cape",lat:-34.07,lon:18.85,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/rdm-somerset-west/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/rdm-somerset-west/`},
+{name:"Shoprite Parklands",platform:"fusionsolar",location:"Cape Town",province:"Western Cape",lat:-33.81,lon:18.53,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/shoprite-parklands/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/shoprite-parklands/`},
+{name:"WG Mdantsane SuperSpar",platform:"fusionsolar",location:"East London",province:"Eastern Cape",lat:-32.97,lon:27.76,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-mdantsane-superspar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-mdantsane-superspar/`},
+{name:"WG Nurture Health",platform:"fusionsolar",location:"East London",province:"Eastern Cape",lat:-32.99,lon:27.87,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-nurture-health/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/wg-nurture-health/`},
+{name:"Aurora",platform:"goodwe",location:"Gqeberha",province:"Eastern Cape",lat:-33.96,lon:25.57,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/aurora/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/aurora/`},
+{name:"BMI Isuzu",platform:"goodwe",location:"Gqeberha",province:"Eastern Cape",lat:-33.87,lon:25.56,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/bmi-isuzu/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/bmi-isuzu/`},
+{name:"WG Bloomingdales",platform:"goodwe",location:"East London",province:"Eastern Cape",lat:-33.01,lon:27.91,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-bloomingdales/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-bloomingdales/`},
+{name:"WG Circular Business Park",platform:"goodwe",location:"Gqeberha",province:"Eastern Cape",lat:-33.87,lon:25.55,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-circular-business-park/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-circular-business-park/`},
+{name:"WG Cure Day Hospital",platform:"goodwe",location:"Gqeberha",province:"Eastern Cape",lat:-33.98,lon:25.57,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-cure-day-hospital/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-cure-day-hospital/`},
+{name:"WG Debi Lee Spar",platform:"goodwe",location:"Gqeberha",province:"Eastern Cape",lat:-33.96,lon:25.61,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-debi-lee-spar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-debi-lee-spar/`},
+{name:"WG Gonubie Mall",platform:"goodwe",location:"Gonubie",province:"Eastern Cape",lat:-32.93,lon:28.02,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-gonubie-mall/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-gonubie-mall/`},
+{name:"WG Heritage Mall",platform:"goodwe",location:"East London",province:"Eastern Cape",lat:-33.02,lon:27.86,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-heritage-mall/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-heritage-mall/`},
+{name:"WG Wellington Square",platform:"goodwe",location:"East London",province:"Eastern Cape",lat:-33.30,lon:27.29,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-wellington-square/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---GoodWe-Sites/sites/wg-wellington-square/`},
+{name:"Kirkwood Tops",platform:"sunsynk",location:"Kirkwood",province:"Eastern Cape",lat:-33.40,lon:25.44,dataUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-tops/data/processed.json`,dashboardUrl:`${BASE}/Kirkwood-Sites---PV-Alert-Dashboard/kirkwood-tops/`},
+{name:"1st Avenue Spar",platform:"fusionsolar",format:"1stavespar",location:"Gqeberha",province:"Eastern Cape",lat:-33.96,lon:25.60,
     dataUrl:`${BASE}/1stAveSpar/data/today_detailed.json`,
     metaUrl:`${BASE}/1stAveSpar/data/last_scrape.json`,
     dashboardUrl:`${BASE}/1stAveSpar/`},
 ];
 
+// ── Globals ─────────────────────────────────────────────────
 const HOUR_START=5,HOUR_END=21;
 const CHART_LABELS=Array.from({length:HOUR_END-HOUR_START},(_,i)=>{const h=i+HOUR_START;return(h<10?'0':'')+h+':00'});
 function slH(arr){return(arr||new Array(24).fill(0)).slice(HOUR_START,HOUR_END)}
-
 let allSitesData=[],siteCharts={},currentMode='average',statusFilter=null,viewDate=null;
-let cardOverrides={};// per-card mode overrides: {cardId:'today'|'average'}
+let cardOverrides={},rotateInterval=null,rotateGroups=[],rotateIdx=0;
 Chart.defaults.devicePixelRatio=window.devicePixelRatio*2||2;
 
 function fmt(n,d=1){const f=Number(n).toFixed(d);const[i,dec]=f.split('.');return i.replace(/\B(?=(\d{3})+(?!\d))/g,' ')+(dec!==undefined?'.'+dec:'')}
@@ -222,70 +404,43 @@ function getPv(s){return(s.today&&s.today.hourly_pv)||s.hourly_pv||new Array(24)
 function getIr(s){return(s.today&&s.today.irradiation)||s.irradiation||new Array(24).fill(0)}
 function todaySAST(){const n=new Date();const s=new Date(n.getTime()+(2*60-n.getTimezoneOffset())*60000);return s.toISOString().slice(0,10)}
 function isStale(site){if(!site.loaded||!site.date)return true;return site.date!==todaySAST()}
+function getHistDate(site,dateStr){return(site.history||{})[dateStr]||null}
 
-// Normalize 1st Avenue Spar's today_detailed.json into standard format
-function normalize1stAve(hourlyArr, meta, site){
-    const pv=new Array(24).fill(0);
-    const ir=new Array(24).fill(0);
-    const avgPv=new Array(24).fill(0);
-    if(Array.isArray(hourlyArr)){
-        hourlyArr.forEach(h=>{
-            const hr=h.hour||0;
-            if(hr>=0&&hr<24){
-                pv[hr]=h.pv_kw||0;
-                ir[hr]=h.irradiation_wm2||0;
-                avgPv[hr]=h.predicted_kw||0;
-            }
-        });
-    }
-    const total=pv.reduce((a,b)=>a+b,0);
-    let lastHour=0;
-    for(let i=23;i>=0;i--){if(pv[i]>0){lastHour=i;break}}
-    const date=meta?.date||todaySAST();
-    return{
-        ...site, loaded:true,
-        plant:'1st Avenue Spar',
-        last_updated:meta?.timestamp||'N/A',
-        date:date,
-        total_kwh:Math.round(total*10)/10,
-        last_hour:lastHour,
-        status:total>0?'ok':'offline',
+function normalize1stAve(hourlyArr,meta,site){
+    const pv=new Array(24).fill(0),ir=new Array(24).fill(0),avgPv=new Array(24).fill(0);
+    if(Array.isArray(hourlyArr))hourlyArr.forEach(h=>{const hr=h.hour||0;if(hr>=0&&hr<24){pv[hr]=h.pv_kw||0;ir[hr]=h.irradiation_wm2||0;avgPv[hr]=h.predicted_kw||0}});
+    const total=pv.reduce((a,b)=>a+b,0);let lastHour=0;for(let i=23;i>=0;i--)if(pv[i]>0){lastHour=i;break}
+    const date=meta?.date||todaySAST();let effectiveDate=date;
+    if(meta?.timestamp){const ts=new Date(meta.timestamp),now=new Date();if((now-ts)/(36e5)<18)effectiveDate=todaySAST()}
+    return{...site,loaded:true,plant:'1st Avenue Spar',last_updated:meta?.timestamp||'N/A',date:effectiveDate,
+        total_kwh:Math.round(total*10)/10,last_hour:lastHour,status:total>0?'ok':'offline',
         alerts:{offline:total<=0,pace_low:false,total_low:false},
-        today:{hourly_pv:pv,irradiation:ir},
-        hourly_pv:pv,
-        irradiation:ir,
+        today:{hourly_pv:pv,irradiation:ir},hourly_pv:pv,irradiation:ir,
         stats_30day:{hourly_avg:avgPv,hourly_min:new Array(24).fill(0),hourly_max:new Array(24).fill(0),
             hourly_p10:new Array(24).fill(0),hourly_p25:new Array(24).fill(0),hourly_p75:new Array(24).fill(0),hourly_p90:new Array(24).fill(0),
-            hourly_irrad_avg:ir, // use today's irrad as avg approximation
-            daily_min:0,daily_max:0,daily_avg:avgPv.reduce((a,b)=>a+b,0),sample_days:1},
-        history:{[date]:{total_kwh:total,hourly:pv,irradiation:ir,last_hour:lastHour}},
-    };
+            hourly_irrad_avg:ir,daily_min:0,daily_max:0,daily_avg:avgPv.reduce((a,b)=>a+b,0),sample_days:1},
+        history:{[date]:{total_kwh:total,hourly:pv,irradiation:ir,last_hour:lastHour}}};
 }
-function calcAvgPct(site){const s=site.stats_30day||{},ha=s.hourly_avg||[];const lh=site.last_hour||0;if(lh<HOUR_START||!ha.length)return null;const e=ha.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);if(e<1)return null;return Math.round(getPv(site).slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0)/e*100)}
-function calcIrradPct(site){const ir=getIr(site),s=site.stats_30day||{},avg=s.hourly_irrad_avg||[];const lh=site.last_hour||0;if(lh<HOUR_START||!avg.length)return null;const tC=ir.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0),aC=avg.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);if(aC<10)return null;return Math.round((tC/aC)*100)}
-function getYesterday(site){const h=site.history||{},d=Object.keys(h).sort();if(d.length<2)return{full:0,byHour:0};const yd=d[d.length-2],yD=h[yd]||{};const lh=site.last_hour||0;return{full:yD.total_kwh||0,byHour:(yD.hourly||new Array(24).fill(0)).slice(0,lh+1).reduce((a,b)=>a+b,0)}}
-// Get data for a specific past date from history
-function getHistDate(site,dateStr){const h=site.history||{};return h[dateStr]||null}
 
-// Client Groups
-function ldGrp(){try{return JSON.parse(localStorage.getItem('g_groups'))||{}}catch(e){return{}}}
-function svGrp(g){localStorage.setItem('g_groups',JSON.stringify(g))}
+function getYesterday(site){const h=site.history||{},d=Object.keys(h).sort();if(d.length<2)return{full:0,byHour:0};const yd=d[d.length-2],yD=h[yd]||{};const lh=site.last_hour||0;return{full:yD.total_kwh||0,byHour:(yD.hourly||new Array(24).fill(0)).slice(0,lh+1).reduce((a,b)=>a+b,0)}}
+
+// ── Groups ──────────────────────────────────────────────────
 let editingGroup='';
-function buildGroupMenu(){const groups=ldGrp(),menu=document.getElementById('groupMenu'),gn=Object.keys(groups);let html='<div class="dropdown-header">Select Group</div>';if(!gn.length)html+='<div class="dropdown-item" style="color:#6b7280;font-size:0.7rem">No groups yet</div>';else gn.forEach(g=>{html+=`<div class="dropdown-item" style="justify-content:space-between"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1"><input type="checkbox" value="${g}" onchange="applyFilters()"> ${g} (${groups[g].length})</label><span class="group-del" onclick="event.stopPropagation();deleteGroup('${g}')">✕</span></div>`});html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Create New Group</div><div class="group-row"><input id="newGrpName" placeholder="Group name..." onkeydown="if(event.key==='Enter')createGroup()"><button onclick="createGroup()">Create</button></div>`;if(gn.length){html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Edit Group</div><div class="group-row"><select id="editGrpSel" style="flex:1;background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#e2e8f0;padding:5px;font-size:0.72rem" onchange="editingGroup=this.value;buildGroupMenu()"><option value="">Choose group...</option>${gn.map(g=>`<option value="${g}" ${editingGroup===g?'selected':''}>${g}</option>`).join('')}</select></div>`;if(editingGroup&&groups[editingGroup]){html+='<div class="group-sites">';ALL_SITES.forEach(s=>{html+=`<label><input type="checkbox" ${groups[editingGroup].includes(s.name)?'checked':''} onchange="togSiteGrp('${s.name}',this.checked)"> ${s.name}</label>`});html+='</div>'}}menu.innerHTML=html}
+function buildGroupMenu(){const groups=ldGrp(),menu=document.getElementById('groupMenu'),gn=Object.keys(groups);let html='<div class="dropdown-header">Select Group</div>';if(!gn.length)html+='<div class="dropdown-item" style="color:#6b7280;font-size:0.7rem">No groups yet</div>';else gn.forEach(g=>{html+=`<div class="dropdown-item" style="justify-content:space-between"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1"><input type="checkbox" value="${g}" onchange="applyFilters()"> ${g} (${groups[g].length})</label>${isAdmin()?`<span class="group-del" onclick="event.stopPropagation();deleteGroup('${g}')">✕</span>`:''}</div>`});if(isAdmin()){html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Create New Group</div><div class="group-row"><input id="newGrpName" placeholder="Group name..." onkeydown="if(event.key==='Enter')createGroup()"><button onclick="createGroup()">Create</button></div>`;if(gn.length){html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Edit Group</div><div class="group-row"><select id="editGrpSel" style="flex:1;background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#e2e8f0;padding:5px;font-size:0.72rem" onchange="editingGroup=this.value;buildGroupMenu()"><option value="">Choose group...</option>${gn.map(g=>`<option value="${g}" ${editingGroup===g?'selected':''}>${g}</option>`).join('')}</select></div>`;if(editingGroup&&groups[editingGroup]){html+='<div class="group-sites">';ALL_SITES.forEach(s=>{html+=`<label><input type="checkbox" ${groups[editingGroup].includes(s.name)?'checked':''} onchange="togSiteGrp('${s.name.replace(/'/g,"\\'")}',this.checked)"> ${s.name}</label>`});html+='</div>'}}}menu.innerHTML=html}
 function createGroup(){const inp=document.getElementById('newGrpName'),n=inp.value.trim();if(!n)return;const g=ldGrp();if(!g[n])g[n]=[];svGrp(g);inp.value='';editingGroup=n;buildGroupMenu()}
 function deleteGroup(n){const g=ldGrp();delete g[n];svGrp(g);if(editingGroup===n)editingGroup='';buildGroupMenu();applyFilters()}
 function togSiteGrp(name,checked){const g=ldGrp();if(!editingGroup||!g[editingGroup])return;if(checked&&!g[editingGroup].includes(name))g[editingGroup].push(name);if(!checked)g[editingGroup]=g[editingGroup].filter(n=>n!==name);svGrp(g);buildGroupMenu()}
 
-loadAllSites();
-setInterval(()=>{loadAllSites(true)},300000);
+// ── Load ────────────────────────────────────────────────────
+(async()=>{if(await checkLogin())loadAllSites()})();
+setInterval(()=>{if(currentUser)loadAllSites(true)},300000);
 
 async function loadAllSites(silent=false){
     const promises=ALL_SITES.map(async site=>{
         try{
             if(site.format==='1stavespar'){
                 const[hR,mR]=await Promise.all([fetch(site.dataUrl),fetch(site.metaUrl)]);
-                if(!hR.ok)throw 0;
-                return normalize1stAve(await hR.json(),mR.ok?await mR.json():null,site);
+                if(!hR.ok)throw 0;return normalize1stAve(await hR.json(),mR.ok?await mR.json():null,site);
             }
             const r=await fetch(site.dataUrl);if(!r.ok)throw 0;return{...site,...(await r.json()),loaded:true};
         }catch(e){return{...site,loaded:false,status:'offline',total_kwh:0,last_updated:null,today:{hourly_pv:new Array(24).fill(0),irradiation:new Array(24).fill(0)},hourly_pv:new Array(24).fill(0),stats_30day:{},history:{}}}
@@ -293,13 +448,11 @@ async function loadAllSites(silent=false){
     allSitesData=await Promise.all(promises);
     allSitesData.sort((a,b)=>{const o={offline:0,low:1,ok:2},d=(o[a.status]??2)-(o[b.status]??2);return d!==0?d:(b.total_kwh||0)-(a.total_kwh||0)});
     if(!silent)buildGroupMenu();
-    // Set date picker default
-    const dp=document.getElementById('datePicker');
-    if(!dp.value)dp.value=todaySAST();
+    const dp=document.getElementById('datePicker');if(!dp.value)dp.value=todaySAST();
     updateDashboard(silent);
 }
 
-// Filters
+// ── Filters ─────────────────────────────────────────────────
 function getSelPlatforms(){return[...document.querySelectorAll('#platformMenu input:checked')].map(c=>c.value)}
 function getSelGroups(){return[...document.querySelectorAll('#groupMenu input[type=checkbox]:checked')].map(c=>c.value)}
 function siteInScope(site){if(!getSelPlatforms().includes(site.platform))return false;const sg=getSelGroups();if(sg.length>0){const ag=ldGrp();if(!sg.some(g=>(ag[g]||[]).includes(site.name)))return false}return true}
@@ -308,52 +461,59 @@ function applyFilters(){document.querySelector('#platformDrop .dropdown-toggle')
 function clearAllFilters(){statusFilter=null;document.querySelectorAll('#platformMenu input').forEach(c=>c.checked=true);document.querySelectorAll('#groupMenu input[type=checkbox]').forEach(c=>c.checked=false);document.querySelector('#platformDrop .dropdown-toggle').classList.remove('has-sel');document.querySelector('#groupDrop .dropdown-toggle').classList.remove('has-sel');updateDashboard()}
 function toggleStatus(st){statusFilter=statusFilter===st?null:st;updateDashboard()}
 
-// Date navigation
+// ── Date nav ────────────────────────────────────────────────
 function dateBack(){const dp=document.getElementById('datePicker');const d=new Date(dp.value);d.setDate(d.getDate()-1);dp.value=d.toISOString().slice(0,10);goToDate(dp.value)}
 function dateForward(){const dp=document.getElementById('datePicker');const d=new Date(dp.value);d.setDate(d.getDate()+1);const today=todaySAST();dp.value=d.toISOString().slice(0,10);if(dp.value>today)dp.value=today;goToDate(dp.value)}
 function goToDate(dateStr){viewDate=dateStr===todaySAST()?null:dateStr;updateDashboard()}
+function goToToday(){document.getElementById('datePicker').value=todaySAST();viewDate=null;updateDashboard()}
 
+// ── Auto-rotate ─────────────────────────────────────────────
+function toggleRotate(){
+    if(rotateInterval){clearInterval(rotateInterval);rotateInterval=null;document.getElementById('rotateBtn').classList.remove('rotate-active');document.getElementById('rotateBtn').textContent='▶ Rotate';return}
+    const groups=ldGrp(),gn=Object.keys(groups);
+    if(!gn.length){alert('Create client groups first');return}
+    rotateGroups=gn;rotateIdx=0;
+    document.getElementById('rotateBtn').classList.add('rotate-active');
+    document.getElementById('rotateBtn').textContent='⏸ Rotate';
+    doRotateStep();
+    rotateInterval=setInterval(doRotateStep,15000);
+}
+function doRotateStep(){
+    if(!rotateGroups.length)return;
+    const gName=rotateGroups[rotateIdx%rotateGroups.length];
+    rotateIdx++;
+    // Uncheck all group checkboxes then check this one
+    document.querySelectorAll('#groupMenu input[type=checkbox]').forEach(c=>c.checked=false);
+    buildGroupMenu();
+    // Find and check the right checkbox
+    setTimeout(()=>{
+        const cbs=document.querySelectorAll('#groupMenu input[type=checkbox]');
+        cbs.forEach(c=>{if(c.value===gName)c.checked=true});
+        const grid=document.getElementById('sitesContainer');
+        grid.classList.add('fading');
+        setTimeout(()=>{applyFilters();grid.classList.remove('fading');window.scrollTo({top:0,behavior:'smooth'})},300);
+    },50);
+}
+
+// ── Dashboard update ────────────────────────────────────────
 function updateDashboard(silent=false){
     const scope=allSitesData.filter(s=>siteInScope(s));
-
-    // If viewing a past date, compute totals from that date's history
     let tot=0;
-    if(viewDate){
-        scope.forEach(s=>{const hd=getHistDate(s,viewDate);if(hd)tot+=hd.total_kwh||0});
-    } else {
-        tot=scope.filter(s=>!isStale(s)).reduce((s,d)=>s+(d.total_kwh||0),0);
-    }
-
-    let yFull=0,yByHour=0;
-    scope.forEach(s=>{const y=getYesterday(s);yFull+=y.full;yByHour+=y.byHour});
+    if(viewDate){scope.forEach(s=>{const hd=getHistDate(s,viewDate);if(hd)tot+=hd.total_kwh||0})}
+    else{tot=scope.filter(s=>!isStale(s)).reduce((s,d)=>s+(d.total_kwh||0),0)}
+    let yFull=0,yByHour=0;scope.forEach(s=>{const y=getYesterday(s);yFull+=y.full;yByHour+=y.byHour});
     document.getElementById('fleetTotal').innerHTML=`${fmt(tot,1)} <span>kWh</span>`;
     document.getElementById('yestVal').textContent=`${fmtI(yFull)} kWh`;
     document.getElementById('yestByHourVal').textContent=`${fmtI(yByHour)} kWh`;
-    // % of yesterday by hour
     const genPct=yByHour>0?Math.round((tot/yByHour)*100):0;
-    const genPctEl=document.getElementById('genPct');
-    genPctEl.textContent=`${genPct}% vs yesterday`;
-    genPctEl.style.color=genPct>=85?'#22c55e':genPct>=50?'#eab308':'#fb923c';
-
-    let todayIrr=0,yestIrr=0;
-    const activeSites=viewDate?scope:scope.filter(s=>!isStale(s));
-    activeSites.forEach(s=>{
-        const lh=s.last_hour||0;
-        if(viewDate){
-            const hd=getHistDate(s,viewDate);
-            if(hd)todayIrr+=(hd.irradiation||[]).slice(0,24).reduce((a,b)=>a+b,0);
-        } else {
-            todayIrr+=getIr(s).slice(0,lh+1).reduce((a,b)=>a+b,0);
-        }
-        const h=s.history||{},dates=Object.keys(h).sort();
-        if(dates.length>=2)yestIrr+=(h[dates[dates.length-2]]?.irradiation||[]).slice(0,lh+1).reduce((a,b)=>a+b,0);
-    });
-    const irrPct=yestIrr>0?Math.round((todayIrr/yestIrr)*100):0;
-    const irrColor=irrPct>=85?'#22c55e':irrPct>=60?'#eab308':'#fb923c';
+    const gEl=document.getElementById('genPct');gEl.textContent=`${genPct}% vs yesterday`;
+    gEl.style.color=genPct>=85?'#22c55e':genPct>=50?'#eab308':'#fb923c';
+    let todayIrr=0,yestIrr=0;const activeSites=viewDate?scope:scope.filter(s=>!isStale(s));
+    activeSites.forEach(s=>{const lh=s.last_hour||0;if(viewDate){const hd=getHistDate(s,viewDate);if(hd)todayIrr+=(hd.irradiation||[]).reduce((a,b)=>a+b,0)}else{todayIrr+=getIr(s).slice(0,lh+1).reduce((a,b)=>a+b,0)}const h=s.history||{},dates=Object.keys(h).sort();if(dates.length>=2)yestIrr+=(h[dates[dates.length-2]]?.irradiation||[]).slice(0,lh+1).reduce((a,b)=>a+b,0)});
+    const iP=yestIrr>0?Math.round((todayIrr/yestIrr)*100):0,iC=iP>=85?'#22c55e':iP>=60?'#eab308':'#fb923c';
     document.getElementById('todayIrrVal').textContent=`${fmtI(todayIrr)} W/m²`;
     document.getElementById('yestIrrVal').textContent=`${fmtI(yestIrr)} W/m²`;
-    document.getElementById('irrPctLabel').innerHTML=`Today / Yesterday irradiation · <span style="color:${irrColor};font-weight:700">${irrPct}%</span>`;
-
+    document.getElementById('irrPctLabel').innerHTML=`Today / Yesterday irradiation · <span style="color:${iC};font-weight:700">${iP}%</span>`;
     const ok=scope.filter(s=>!isStale(s)&&s.status==='ok').length,lo=scope.filter(s=>!isStale(s)&&s.status==='low').length,off=scope.filter(s=>isStale(s)||s.status==='offline'||!s.loaded).length;
     let bh='';
     if(ok)bh+=`<div class="fleet-badge ok-b${statusFilter==='ok'?' active':''}" onclick="toggleStatus('ok')"><div class="bd"></div><div class="bc">${ok} OK</div></div>`;
@@ -361,19 +521,13 @@ function updateDashboard(silent=false){
     if(off)bh+=`<div class="fleet-badge off-b${statusFilter==='offline'?' active':''}" onclick="toggleStatus('offline')"><div class="bd"></div><div class="bc">${off} Offline</div></div>`;
     document.getElementById('statusBadges').innerHTML=bh;
     document.getElementById('lastUpdated').textContent=`Updated ${allSitesData.filter(s=>s.last_updated).map(s=>s.last_updated).sort().reverse()[0]||'N/A'}`;
-    updateLegend();
-    const scrollY=silent?window.scrollY:0;
-    renderCards();
-    if(silent)window.scrollTo(0,scrollY);
+    updateLegend();const scrollY=silent?window.scrollY:0;renderCards();if(silent)window.scrollTo(0,scrollY);
 }
 
 function updateLegend(){
     const lb=document.getElementById('legendBar');
-    if(currentMode==='today'){
-        lb.innerHTML=`<div class="legend-item"><div class="legend-swatch" style="background:#22c55e"></div>PV Generation</div><div class="legend-item"><div class="legend-swatch" style="background:#eab308;height:0;border-top:2px dotted #eab308"></div>Today Irradiation</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(234,179,8,0.25)"></div>Avg Irradiation</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(96,165,250,0.6);height:0;border-top:2px dashed rgba(96,165,250,0.6)"></div>30-Day Avg PV</div>`;
-    } else {
-        lb.innerHTML=`<div class="legend-item"><div class="legend-swatch" style="background:#22c55e;height:2px"></div>Today PV</div><div class="legend-item"><div class="legend-swatch" style="background:#60a5fa;height:0;border-top:2px dashed #60a5fa"></div>Median</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(34,197,94,0.3)"></div>P25-P75</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(180,140,60,0.7);height:0;border-top:1px solid rgba(180,140,60,0.7)"></div>Min</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(150,100,220,0.7);height:0;border-top:1px solid rgba(150,100,220,0.7)"></div>Max</div>`;
-    }
+    if(currentMode==='today')lb.innerHTML=`<div class="legend-item"><div class="legend-swatch" style="background:#22c55e"></div>PV Generation</div><div class="legend-item"><div class="legend-swatch" style="background:#eab308;height:0;border-top:2px dotted #eab308"></div>Today Irradiation</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(234,179,8,0.25)"></div>Avg Irradiation</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(96,165,250,0.6);height:0;border-top:2px dashed rgba(96,165,250,0.6)"></div>30-Day Avg PV</div>`;
+    else lb.innerHTML=`<div class="legend-item"><div class="legend-swatch" style="background:#22c55e;height:2px"></div>Today PV</div><div class="legend-item"><div class="legend-swatch" style="background:#60a5fa;height:0;border-top:2px dashed #60a5fa"></div>Median</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(34,197,94,0.3)"></div>P25-P75</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(180,140,60,0.7);height:0;border-top:1px solid rgba(180,140,60,0.7)"></div>Min</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(150,100,220,0.7);height:0;border-top:1px solid rgba(150,100,220,0.7)"></div>Max</div>`;
 }
 
 function renderCards(){
@@ -387,150 +541,94 @@ function createCard(site){
     const cid=`c-${site.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`;
     const stale=isStale(site);
     const pl={fusionsolar:'FusionSolar',goodwe:'GoodWe',sunsynk:'Sunsynk'}[site.platform]||'';
-
-    // If viewing a past date, pull that date's data for card values
     let kwh,st,stL,dateNote='',cardPv,cardIr;
-    if(viewDate){
-        const hd=getHistDate(site,viewDate);
-        kwh=hd?hd.total_kwh||0:0;
-        st=kwh>0?'ok':'offline';
-        stL=hd?'':'NO DATA';
-        if(!hd)dateNote=`<span style="color:#6b7280;font-size:0.5rem;margin-left:4px">No data for ${viewDate}</span>`;
-        cardPv=hd?hd.hourly||new Array(24).fill(0):new Array(24).fill(0);
-        cardIr=hd?hd.irradiation||new Array(24).fill(0):new Array(24).fill(0);
-    } else {
-        kwh=site.total_kwh||0;
-        st=stale?'offline':(site.status||'offline');
-        stL=stale?'STALE':st==='offline'?'OFFLINE':st==='low'?'LOW':'OK';
-        dateNote=stale&&site.date?`<span style="color:#ef4444;font-size:0.5rem;font-weight:700;margin-left:4px">${site.date}</span>`:'';
-        cardPv=getPv(site);
-        cardIr=getIr(site);
-    }
-
-    // Calculate % of avg using the correct date's PV data
+    if(viewDate){const hd=getHistDate(site,viewDate);kwh=hd?hd.total_kwh||0:0;st=kwh>0?'ok':'offline';stL=hd?'':'NO DATA';cardPv=hd?hd.hourly||new Array(24).fill(0):new Array(24).fill(0);cardIr=hd?hd.irradiation||new Array(24).fill(0):new Array(24).fill(0)}
+    else{kwh=site.total_kwh||0;st=stale?'offline':(site.status||'offline');stL=stale?'STALE':st==='offline'?'OFFLINE':st==='low'?'LOW':'OK';dateNote=stale&&site.date?`<span style="color:#ef4444;font-size:0.5rem;font-weight:700;margin-left:4px">${site.date}</span>`:'';cardPv=getPv(site);cardIr=getIr(site)}
     const stats=site.stats_30day||{},ha=stats.hourly_avg||[];
     let ap=null;
-    if(!stale||viewDate){
-        const lh=viewDate?(function(){for(let i=23;i>=0;i--)if(cardPv[i]>0)return i;return 0})():(site.last_hour||0);
-        if(lh>=HOUR_START&&ha.length){
-            const exp=ha.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);
-            if(exp>=1)ap=Math.round(cardPv.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0)/exp*100);
-        }
-    }
+    if(!stale||viewDate){const lh=viewDate?(()=>{for(let i=23;i>=0;i--)if(cardPv[i]>0)return i;return 0})():(site.last_hour||0);if(lh>=HOUR_START&&ha.length){const exp=ha.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);if(exp>=1)ap=Math.round(cardPv.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0)/exp*100)}}
     const apS=ap!==null?ap+'%':'--',apC=ap===null?'':ap>=70?'good':ap>=40?'warn':'bad';
-
-    // Irradiation %
-    let ip=null;
-    const avgIr=stats.hourly_irrad_avg||[];
-    if((!stale||viewDate)&&avgIr.length){
-        const lh=viewDate?(function(){for(let i=23;i>=0;i--)if(cardPv[i]>0)return i;return 0})():(site.last_hour||0);
-        if(lh>=HOUR_START){
-            const tC=cardIr.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);
-            const aC=avgIr.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);
-            if(aC>=10)ip=Math.round((tC/aC)*100);
-        }
-    }
+    let ip=null;const avgIr=stats.hourly_irrad_avg||[];
+    if((!stale||viewDate)&&avgIr.length){const lh=viewDate?(()=>{for(let i=23;i>=0;i--)if(cardPv[i]>0)return i;return 0})():(site.last_hour||0);if(lh>=HOUR_START){const tC=cardIr.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0),aC=avgIr.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);if(aC>=10)ip=Math.round((tC/aC)*100)}}
     const ipS=ip!==null?ip+'%':'--';
-
-    const cardMode=cardOverrides[cid]||currentMode;
-    const toggleLabel=cardMode==='today'?'30D':'T';
-    const toggleTitle=cardMode==='today'?'Switch to 30-Day Avg':'Switch to Today';
-
-    card.innerHTML=`
-        <div class="site-topbar">
-            <div class="site-row1">
-                <div class="site-row1-left">
-                    <div class="sn">${site.name}</div>
-                    <div class="si ${st}"></div>
-                    <span class="sp ${site.platform}">${pl}</span>
-                </div>
-                <div class="site-badges">
-                    <div class="sb ${apC}">${apS} of avg</div>
-                    <div class="sb irr">${ipS} irrad</div>
-                </div>
-            </div>
-            <div class="site-row2">
-                <div style="display:flex;align-items:center;gap:5px">
-                    <div class="skwh">${fmt(kwh,1)} <i>kWh</i></div>
-                    <div class="sl ${st}">${stL}</div>${dateNote}
-                </div>
-            </div>
-        </div>
-        <div class="site-chart-wrapper">
-            <button class="card-toggle" onclick="event.stopPropagation();toggleCard('${cid}')" title="${toggleTitle}">${toggleLabel}</button>
-            <div class="site-chart-container"><canvas id="${cid}"></canvas></div>
-        </div>`;
-    card.onclick=(e)=>{if(!e.target.closest('.card-toggle'))window.open(site.dashboardUrl,'_blank')};
-    return card;
+    const cardMode=cardOverrides[cid]||currentMode;const toggleLabel=cardMode==='today'?'30D':'T';
+    card.innerHTML=`<div class="site-topbar"><div class="site-row1"><div class="site-row1-left"><div class="sn">${site.name}</div><div class="si ${st}"></div><span class="sp ${site.platform}">${pl}</span></div><div class="site-badges"><div class="sb ${apC}">${apS} of avg</div><div class="sb irr">${ipS} irrad</div></div></div><div class="site-row2"><div style="display:flex;align-items:center;gap:5px"><div class="skwh">${fmt(kwh,1)} <i>kWh</i></div><div class="sl ${st}">${stL}</div>${dateNote}</div></div></div><div class="site-chart-wrapper"><button class="card-toggle" onclick="event.stopPropagation();toggleCard('${cid}')" title="Toggle view">${toggleLabel}</button><div class="site-chart-container"><canvas id="${cid}"></canvas></div></div>`;
+    card.onclick=(e)=>{if(!e.target.closest('.card-toggle'))window.open(site.dashboardUrl,'_blank')};return card;
 }
 
-function toggleCard(cid){
-    const cur=cardOverrides[cid]||currentMode;
-    cardOverrides[cid]=cur==='today'?'average':'today';
-    const site=allSitesData.find(s=>`c-${s.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`===cid);
-    if(site)renderChart(site);
-    // Update button label
-    const btn=document.querySelector(`#${CSS.escape(cid)}`);
-    if(btn){const wrap=btn.closest('.site-chart-wrapper');if(wrap){const tb=wrap.querySelector('.card-toggle');if(tb){const m=cardOverrides[cid]||currentMode;tb.textContent=m==='today'?'30D':'T';tb.title=m==='today'?'Switch to 30-Day Avg':'Switch to Today'}}}
-}
+function toggleCard(cid){const cur=cardOverrides[cid]||currentMode;cardOverrides[cid]=cur==='today'?'average':'today';const site=allSitesData.find(s=>`c-${s.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`===cid);if(site)renderChart(site);const wrap=document.getElementById(cid)?.closest('.site-chart-wrapper');if(wrap){const tb=wrap.querySelector('.card-toggle');if(tb){const m=cardOverrides[cid];tb.textContent=m==='today'?'30D':'T'}}}
 
 function trunc(arr){let l=0;for(let i=arr.length-1;i>=0;i--){if(arr[i]>0){l=i;break}}return arr.map((v,i)=>i<=l?v:null)}
 
 function renderChart(site){
     const cid=`c-${site.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`;
     const canvas=document.getElementById(cid);if(!canvas)return;
-    const ctx=canvas.getContext('2d');
-    const stats=site.stats_30day||{};
+    const ctx=canvas.getContext('2d');const stats=site.stats_30day||{};
     if(siteCharts[cid])siteCharts[cid].destroy();
-
-    // Check if viewing a past date
-    let pv,ir;
-    if(viewDate){
-        const hd=getHistDate(site,viewDate);
-        pv=slH(hd?hd.hourly:new Array(24).fill(0));
-        ir=slH(hd?hd.irradiation:new Array(24).fill(0));
-    } else {
-        pv=slH(getPv(site));
-        ir=slH(getIr(site));
-    }
-    const avgIr=slH(stats.hourly_irrad_avg||new Array(24).fill(0));
-
-    const mode=cardOverrides[cid]||currentMode;
-
-    if(mode==='today'){
-        const maxIr=Math.max(...ir,...avgIr,1);
-        const y1Max=maxIr/0.7;
-        siteCharts[cid]=new Chart(ctx,{type:'bar',data:{labels:CHART_LABELS,datasets:[
-            {type:'line',data:avgIr,backgroundColor:'rgba(234,179,8,0.12)',borderColor:'rgba(234,179,8,0.25)',borderWidth:0.5,fill:true,yAxisID:'y1',pointRadius:0,tension:0.4,order:4},
-            {type:'line',data:ir,borderColor:'#eab308',borderWidth:1.5,borderDash:[4,3],fill:false,yAxisID:'y1',pointRadius:0,tension:0.4,order:3},
-            {type:'line',data:slH(stats.hourly_avg||new Array(24).fill(0)),borderColor:'rgba(96,165,250,0.6)',borderWidth:1,borderDash:[3,2],fill:false,pointRadius:0,tension:0.4,order:1},
-            {type:'bar',data:pv,backgroundColor:'#22c55e',borderWidth:0,barPercentage:0.8,categoryPercentage:0.9,order:2}
-        ]},options:chartOpts('y1',y1Max)});
-    } else {
-        siteCharts[cid]=new Chart(ctx,{type:'bar',data:{labels:CHART_LABELS,datasets:[
-            {type:'line',data:slH(stats.hourly_min||new Array(24).fill(0)),backgroundColor:'rgba(120,80,40,0.10)',borderColor:'rgba(180,140,60,0.7)',borderWidth:1,fill:'+1',pointRadius:0,tension:0.4,order:6},
-            {type:'line',data:slH(stats.hourly_max||new Array(24).fill(0)),backgroundColor:'transparent',borderColor:'rgba(150,100,220,0.7)',borderWidth:1,pointRadius:0,tension:0.4,order:6},
-            {type:'line',data:slH(stats.hourly_p25||new Array(24).fill(0)),backgroundColor:'rgba(34,197,94,0.18)',borderColor:'rgba(34,197,94,0.4)',borderWidth:0.5,fill:'+1',pointRadius:0,tension:0.4,order:4},
-            {type:'line',data:slH(stats.hourly_p75||new Array(24).fill(0)),backgroundColor:'transparent',borderColor:'rgba(34,197,94,0.4)',borderWidth:0.5,pointRadius:0,tension:0.4,order:4},
-            {type:'line',data:slH(stats.hourly_avg||new Array(24).fill(0)),borderColor:'#60a5fa',borderWidth:1.5,borderDash:[4,3],fill:false,pointRadius:0,tension:0.4,order:2},
-            // Today PV as SOLID green line (not dashed)
-            {type:'line',data:trunc(pv),borderColor:'#22c55e',borderWidth:2,fill:false,pointRadius:0,tension:0.4,order:1}
-        ]},options:chartOpts()});
-    }
+    let pv,ir;if(viewDate){const hd=getHistDate(site,viewDate);pv=slH(hd?hd.hourly:new Array(24).fill(0));ir=slH(hd?hd.irradiation:new Array(24).fill(0))}else{pv=slH(getPv(site));ir=slH(getIr(site))}
+    const avgIr=slH(stats.hourly_irrad_avg||new Array(24).fill(0));const mode=cardOverrides[cid]||currentMode;
+    if(mode==='today'){const maxIr=Math.max(...ir,...avgIr,1);siteCharts[cid]=new Chart(ctx,{type:'bar',data:{labels:CHART_LABELS,datasets:[{type:'line',data:avgIr,backgroundColor:'rgba(234,179,8,0.12)',borderColor:'rgba(234,179,8,0.25)',borderWidth:0.5,fill:true,yAxisID:'y1',pointRadius:0,tension:0.4,order:4},{type:'line',data:ir,borderColor:'#eab308',borderWidth:1.5,borderDash:[4,3],fill:false,yAxisID:'y1',pointRadius:0,tension:0.4,order:3},{type:'line',data:slH(stats.hourly_avg||new Array(24).fill(0)),borderColor:'rgba(96,165,250,0.6)',borderWidth:1,borderDash:[3,2],fill:false,pointRadius:0,tension:0.4,order:1},{type:'bar',data:pv,backgroundColor:'#22c55e',borderWidth:0,barPercentage:0.8,categoryPercentage:0.9,order:2}]},options:cOpts('y1',maxIr/0.7)})}
+    else{siteCharts[cid]=new Chart(ctx,{type:'bar',data:{labels:CHART_LABELS,datasets:[{type:'line',data:slH(stats.hourly_min||new Array(24).fill(0)),backgroundColor:'rgba(120,80,40,0.10)',borderColor:'rgba(180,140,60,0.7)',borderWidth:1,fill:'+1',pointRadius:0,tension:0.4,order:6},{type:'line',data:slH(stats.hourly_max||new Array(24).fill(0)),backgroundColor:'transparent',borderColor:'rgba(150,100,220,0.7)',borderWidth:1,pointRadius:0,tension:0.4,order:6},{type:'line',data:slH(stats.hourly_p25||new Array(24).fill(0)),backgroundColor:'rgba(34,197,94,0.18)',borderColor:'rgba(34,197,94,0.4)',borderWidth:0.5,fill:'+1',pointRadius:0,tension:0.4,order:4},{type:'line',data:slH(stats.hourly_p75||new Array(24).fill(0)),backgroundColor:'transparent',borderColor:'rgba(34,197,94,0.4)',borderWidth:0.5,pointRadius:0,tension:0.4,order:4},{type:'line',data:slH(stats.hourly_avg||new Array(24).fill(0)),borderColor:'#60a5fa',borderWidth:1.5,borderDash:[4,3],fill:false,pointRadius:0,tension:0.4,order:2},{type:'line',data:trunc(pv),borderColor:'#22c55e',borderWidth:2,fill:false,pointRadius:0,tension:0.4,order:1}]},options:cOpts()})}
 }
-
-function chartOpts(y1Id,y1Max){
-    const o={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{
-        x:{grid:{color:'rgba(148,163,184,0.06)',drawBorder:false},ticks:{color:'#4b5563',font:{size:8},maxTicksLimit:8}},
-        y:{beginAtZero:true,grid:{color:'rgba(148,163,184,0.06)',drawBorder:false},ticks:{color:'#4b5563',font:{size:8},maxTicksLimit:4}}}};
-    if(y1Id)o.scales.y1={beginAtZero:true,position:'right',display:false,grid:{drawOnChartArea:false},max:y1Max};
-    return o;
-}
-
+function cOpts(y1Id,y1Max){const o={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{color:'rgba(148,163,184,0.06)',drawBorder:false},ticks:{color:'#4b5563',font:{size:8},maxTicksLimit:8}},y:{beginAtZero:true,grid:{color:'rgba(148,163,184,0.06)',drawBorder:false},ticks:{color:'#4b5563',font:{size:8},maxTicksLimit:4}}}};if(y1Id)o.scales.y1={beginAtZero:true,position:'right',display:false,grid:{drawOnChartArea:false},max:y1Max};return o}
 function switchMode(m){currentMode=m;cardOverrides={};document.getElementById('modeToday').classList.toggle('active',m==='today');document.getElementById('modeAvg').classList.toggle('active',m==='average');updateLegend();renderCards()}
-
 function toggleDrop(id){document.querySelectorAll('.dropdown-menu').forEach(m=>{if(m.id!==id)m.classList.remove('show')});document.getElementById(id).classList.toggle('show');if(id==='groupMenu')buildGroupMenu()}
 document.addEventListener('click',e=>{if(!e.target.closest('.dropdown'))document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('show'))});
+
+// ── SA Map ──────────────────────────────────────────────────
+function openMap(){document.getElementById('mapOverlay').classList.add('show');buildMapDots()}
+function closeMap(){document.getElementById('mapOverlay').classList.remove('show')}
+
+function buildMapDots(){
+    const dotsEl=document.getElementById('mapDots');dotsEl.innerHTML='';
+    // Group sites by location
+    const locs={};
+    allSitesData.forEach(s=>{
+        const k=s.location||'Unknown';
+        if(!locs[k])locs[k]={sites:[],lat:s.lat||0,lon:s.lon||0,province:s.province||''};
+        locs[k].sites.push(s);
+    });
+    const svg=document.getElementById('saMap');
+    const svgRect=svg.getBoundingClientRect();
+    const wrap=document.getElementById('mapWrap');
+    const wRect=wrap.getBoundingClientRect();
+
+    Object.entries(locs).forEach(([locName,data])=>{
+        // Convert lat/lon to SVG coordinates (approximate mapping)
+        // SA roughly: lat -22 to -35, lon 16 to 33
+        const xPct=(data.lon-16)/(33-16);
+        const yPct=(data.lat-(-22))/((-35)-(-22));
+        const x=xPct*100;const y=yPct*100;
+
+        // Determine status
+        const allOk=data.sites.every(s=>!isStale(s)&&s.status==='ok');
+        const anyLow=data.sites.some(s=>!isStale(s)&&s.status==='low');
+        const anyOff=data.sites.some(s=>isStale(s)||s.status==='offline'||!s.loaded);
+        const statusClass=anyOff?'error':anyLow?'warn':'ok';
+
+        const dot=document.createElement('div');
+        dot.className='map-dot';
+        dot.style.left=x+'%';dot.style.top=y+'%';
+        dot.innerHTML=`<div class="map-dot-inner ${statusClass}" style="color:${statusClass==='ok'?'#22c55e':statusClass==='warn'?'#fb923c':'#ef4444'}"></div><div class="map-dot-label">${locName} <span class="map-dot-count">(${data.sites.length})</span></div><div class="map-dropdown" id="md-${locName.replace(/[^a-zA-Z0-9]/g,'')}"></div>`;
+
+        dot.onclick=(e)=>{
+            e.stopPropagation();
+            const dd=dot.querySelector('.map-dropdown');
+            document.querySelectorAll('.map-dropdown.show').forEach(d=>{if(d!==dd)d.classList.remove('show')});
+            dd.classList.toggle('show');
+            if(dd.classList.contains('show')){
+                dd.innerHTML=data.sites.map(s=>{
+                    const st=isStale(s)?'offline':(s.status||'offline');
+                    const color=st==='ok'?'#22c55e':st==='low'?'#fb923c':'#6b7280';
+                    return`<div class="map-dropdown-item" onclick="window.open('${s.dashboardUrl}','_blank')"><div class="mdi" style="background:${color}"></div>${s.name} — ${fmt(s.total_kwh||0)} kWh</div>`;
+                }).join('');
+            }
+        };
+        dotsEl.appendChild(dot);
+    });
+    // Close dropdowns on map click
+    document.getElementById('mapOverlay').onclick=(e)=>{if(!e.target.closest('.map-dot'))document.querySelectorAll('.map-dropdown.show').forEach(d=>d.classList.remove('show'))};
+}
 </script>
 </body>
-    </html>
+</html>
