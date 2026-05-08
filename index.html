@@ -188,6 +188,45 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
             <div class="fleet-status-badges" id="statusBadges"></div>
         </div>
     </div>
+    <!-- Station count + Alarms + Problematic row -->
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <!-- Station Count (collapsible) -->
+        <div style="background:linear-gradient(135deg,#1a2332,#1e2936);border-radius:10px;padding:14px 18px;flex:1;min-width:180px;cursor:pointer" onclick="toggleStationDrop()">
+            <div style="display:flex;align-items:center;gap:10px">
+                <div style="display:flex;align-items:center;gap:6px">
+                    <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e"></div>
+                    <div style="width:10px;height:10px;border-radius:50%;background:#fb923c;box-shadow:0 0 6px #fb923c"></div>
+                    <div style="width:10px;height:10px;border-radius:50%;background:#6b7280;box-shadow:0 0 6px #6b7280"></div>
+                </div>
+                <div style="font-size:2rem;font-weight:700;color:#fff" id="stationCount">0</div>
+                <div style="color:#9ca3af;font-size:0.7rem">Station Number</div>
+                <div style="color:#4b5563;font-size:0.7rem;margin-left:auto" id="stationChev">▼</div>
+            </div>
+            <div id="stationDrop" style="display:none;margin-top:10px;max-height:200px;overflow-y:auto"></div>
+        </div>
+        <!-- Alarms donut -->
+        <div style="background:linear-gradient(135deg,#1a2332,#1e2936);border-radius:10px;padding:14px 18px;min-width:160px;text-align:center">
+            <div style="font-size:0.6rem;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Alarms</div>
+            <div style="position:relative;width:80px;height:80px;margin:0 auto">
+                <canvas id="alarmDonut" width="80" height="80"></canvas>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column">
+                    <div style="font-size:1.4rem;font-weight:700;color:#fff" id="alarmTotal">0</div>
+                    <div style="font-size:0.5rem;color:#6b7280">Total Faults</div>
+                </div>
+            </div>
+            <div style="display:flex;justify-content:center;gap:12px;margin-top:8px;font-size:0.55rem">
+                <div><span style="color:#ef4444">●</span> <span style="color:#9ca3af">Fault</span> <span style="color:#fff;font-weight:700" id="alarmFault">0</span></div>
+                <div><span style="color:#fb923c">●</span> <span style="color:#9ca3af">Low</span> <span style="color:#fff;font-weight:700" id="alarmLow">0</span></div>
+                <div><span style="color:#3b82f6">●</span> <span style="color:#9ca3af">Stale</span> <span style="color:#fff;font-weight:700" id="alarmStale">0</span></div>
+            </div>
+        </div>
+        <!-- Problematic sites slideshow -->
+        <div style="background:linear-gradient(135deg,#1a2332,#1e2936);border-radius:10px;padding:14px 18px;min-width:260px;max-width:320px;overflow:hidden;position:relative">
+            <div style="font-size:0.6rem;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Problematic Sites</div>
+            <div id="problemSlide" style="transition:transform 0.6s ease"></div>
+            <div style="font-size:0.5rem;color:#4b5563;margin-top:6px" id="problemCount">--</div>
+        </div>
+    </div>
     <div class="controls">
         <div class="dropdown" id="platformDrop">
             <button class="dropdown-toggle" onclick="toggleDrop('platformMenu')">Platform ▾</button>
@@ -512,6 +551,21 @@ function updateDashboard(silent=false){
     if(off)bh+=`<div class="fleet-badge off-b${statusFilter==='offline'?' active':''}" onclick="toggleStatus('offline')"><div class="bd"></div><div class="bc">${off} Offline</div></div>`;
     document.getElementById('statusBadges').innerHTML=bh;
     document.getElementById('lastUpdated').textContent=`Updated ${allSitesData.filter(s=>s.last_updated).map(s=>s.last_updated).sort().reverse()[0]||'N/A'}`;
+    // Station count
+    document.getElementById('stationCount').textContent=scope.length;
+    // Alarms
+    const faultCount=scope.filter(s=>!isStale(s)&&s.status==='offline'&&s.loaded).length;
+    const lowCount=scope.filter(s=>!isStale(s)&&s.status==='low').length;
+    const staleCount=scope.filter(s=>isStale(s)).length;
+    document.getElementById('alarmTotal').textContent=faultCount+lowCount+staleCount;
+    document.getElementById('alarmFault').textContent=faultCount;
+    document.getElementById('alarmLow').textContent=lowCount;
+    document.getElementById('alarmStale').textContent=staleCount;
+    drawAlarmDonut(faultCount,lowCount,staleCount);
+    // Station dropdown content
+    buildStationList(scope);
+    // Problematic sites slideshow
+    buildProblemSlide(scope);
     updateLegend();const scrollY=silent?window.scrollY:0;renderCards();if(silent)window.scrollTo(0,scrollY);
 }
 
@@ -543,7 +597,13 @@ function createCard(site){
     if((!stale||viewDate)&&avgIr.length){const lh=viewDate?(()=>{for(let i=23;i>=0;i--)if(cardPv[i]>0)return i;return 0})():(site.last_hour||0);if(lh>=HOUR_START){const tC=cardIr.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0),aC=avgIr.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);if(aC>=10)ip=Math.round((tC/aC)*100)}}
     const ipS=ip!==null?ip+'%':'--';
     const cardMode=cardOverrides[cid]||currentMode;const toggleLabel=cardMode==='today'?'30D':'T';
-    card.innerHTML=`<div class="site-topbar"><div class="site-row1"><div class="site-row1-left"><div class="sn">${site.name}</div><div class="si ${st}"></div><span class="sp ${site.platform}">${pl}</span></div><div class="site-badges"><div class="sb ${apC}">${apS} of avg</div><div class="sb irr">${ipS} irrad</div></div></div><div class="site-row2"><div style="display:flex;align-items:center;gap:5px"><div class="skwh">${fmt(kwh,1)} <i>kWh</i></div><div class="sl ${st}">${stL}</div>${dateNote}</div></div></div><div class="site-chart-wrapper"><button class="card-toggle" onclick="event.stopPropagation();toggleCard('${cid}')" title="Toggle view">${toggleLabel}</button><div class="site-chart-container"><canvas id="${cid}"></canvas></div></div>`;
+    // Yesterday by-hour for comparison
+    let yestByHr='';
+    if(!viewDate){
+        const yd=getYesterday(site);
+        if(yd.byHour>0)yestByHr=`<span style="color:#6b7280;font-size:0.55rem;margin-left:2px">/ ${fmt(yd.byHour,0)} y</span>`;
+    }
+    card.innerHTML=`<div class="site-topbar"><div class="site-row1"><div class="site-row1-left"><div class="sn">${site.name}</div><div class="si ${st}"></div><span class="sp ${site.platform}">${pl}</span></div><div class="site-badges"><div class="sb ${apC}">${apS} of avg</div><div class="sb irr">${ipS} irrad</div></div></div><div class="site-row2"><div style="display:flex;align-items:center;gap:5px"><div class="skwh">${fmt(kwh,1)} <i>kWh</i>${yestByHr}</div><div class="sl ${st}">${stL}</div>${dateNote}</div></div></div><div class="site-chart-wrapper"><button class="card-toggle" onclick="event.stopPropagation();toggleCard('${cid}')" title="Toggle view">${toggleLabel}</button><div class="site-chart-container"><canvas id="${cid}"></canvas></div></div>`;
     card.onclick=(e)=>{if(!e.target.closest('.card-toggle'))window.open(site.dashboardUrl,'_blank')};return card;
 }
 
@@ -565,6 +625,86 @@ function cOpts(y1Id,y1Max){const o={responsive:true,maintainAspectRatio:false,pl
 function switchMode(m){currentMode=m;cardOverrides={};document.getElementById('modeToday').classList.toggle('active',m==='today');document.getElementById('modeAvg').classList.toggle('active',m==='average');updateLegend();renderCards()}
 function toggleDrop(id){document.querySelectorAll('.dropdown-menu').forEach(m=>{if(m.id!==id)m.classList.remove('show')});document.getElementById(id).classList.toggle('show');if(id==='groupMenu')buildGroupMenu()}
 document.addEventListener('click',e=>{if(!e.target.closest('.dropdown'))document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('show'))});
+
+// ── Station dropdown ─────────────────────────────────────────
+let stationDropOpen=localStorage.getItem('g_stationDrop')==='1';
+function toggleStationDrop(){
+    stationDropOpen=!stationDropOpen;
+    localStorage.setItem('g_stationDrop',stationDropOpen?'1':'0');
+    document.getElementById('stationDrop').style.display=stationDropOpen?'block':'none';
+    document.getElementById('stationChev').textContent=stationDropOpen?'▲':'▼';
+}
+function buildStationList(scope){
+    const el=document.getElementById('stationDrop');
+    el.style.display=stationDropOpen?'block':'none';
+    document.getElementById('stationChev').textContent=stationDropOpen?'▲':'▼';
+    el.innerHTML=scope.map(s=>{
+        const st=isStale(s)?'offline':(s.status||'offline');
+        const c=st==='ok'?'#22c55e':st==='low'?'#fb923c':'#6b7280';
+        return`<div style="display:flex;align-items:center;gap:6px;padding:3px 0;font-size:0.68rem;cursor:pointer;color:#cbd5e1" onclick="event.stopPropagation();window.open('${s.dashboardUrl}','_blank')"><span style="width:6px;height:6px;border-radius:50%;background:${c};flex-shrink:0"></span>${s.name} <span style="color:#6b7280;margin-left:auto">${fmt(s.total_kwh||0)}</span></div>`;
+    }).join('');
+}
+
+// ── Alarm donut ─────────────────────────────────────────────
+function drawAlarmDonut(fault,low,stale){
+    const canvas=document.getElementById('alarmDonut');if(!canvas)return;
+    const ctx=canvas.getContext('2d');
+    const total=fault+low+stale;
+    const cx=40,cy=40,r=32,lw=8;
+    ctx.clearRect(0,0,80,80);
+    if(total===0){
+        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=lw;ctx.stroke();
+        return;
+    }
+    const segments=[{v:fault,c:'#ef4444'},{v:low,c:'#fb923c'},{v:stale,c:'#3b82f6'}];
+    let angle=-Math.PI/2;
+    segments.forEach(seg=>{
+        if(seg.v<=0)return;
+        const sweep=(seg.v/total)*Math.PI*2;
+        ctx.beginPath();ctx.arc(cx,cy,r,angle,angle+sweep);
+        ctx.strokeStyle=seg.c;ctx.lineWidth=lw;ctx.lineCap='round';ctx.stroke();
+        angle+=sweep+0.05;
+    });
+}
+
+// ── Problematic sites slideshow ─────────────────────────────
+let problemIdx=0,problemInterval=null;
+function buildProblemSlide(scope){
+    const problems=scope.filter(s=>{
+        const st=isStale(s)?'offline':(s.status||'offline');
+        return st==='low'||st==='offline';
+    });
+    const el=document.getElementById('problemSlide');
+    const countEl=document.getElementById('problemCount');
+    if(!problems.length){
+        el.innerHTML='<div style="color:#22c55e;font-size:0.75rem;padding:8px 0">✅ All sites operating normally</div>';
+        countEl.textContent='0 issues';
+        if(problemInterval){clearInterval(problemInterval);problemInterval=null}
+        return;
+    }
+    countEl.textContent=`${problems.length} issue${problems.length>1?'s':''}`;
+    // Show current problem
+    function showProblem(idx){
+        const s=problems[idx%problems.length];
+        const st=isStale(s)?'offline':(s.status||'offline');
+        const c=st==='low'?'#fb923c':'#ef4444';
+        const label=st==='low'?'LOW':'OFFLINE';
+        const ap=isStale(s)?null:(()=>{const stats=s.stats_30day||{},ha=stats.hourly_avg||[];const lh=s.last_hour||0;if(lh<5||!ha.length)return null;const exp=ha.slice(5,lh+1).reduce((a,b)=>a+b,0);return exp>=1?Math.round(getPv(s).slice(5,lh+1).reduce((a,b)=>a+b,0)/exp*100):null})();
+        el.innerHTML=`<div style="cursor:pointer" onclick="window.open('${s.dashboardUrl}','_blank')">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+                <div style="font-weight:700;font-size:0.8rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.name}</div>
+                <span style="font-size:0.55rem;font-weight:700;color:${c}">${label}</span>
+            </div>
+            <div style="font-size:0.75rem;color:#fff;font-weight:600">${fmt(s.total_kwh||0)} kWh ${ap!==null?`<span style="color:${ap>=70?'#22c55e':ap>=40?'#fb923c':'#ef4444'};font-size:0.65rem">${ap}% of avg</span>`:''}</div>
+            <div style="font-size:0.5rem;color:#6b7280;margin-top:2px">${problems.length>1?`${(idx%problems.length)+1} of ${problems.length}`:''}</div>
+        </div>`;
+    }
+    showProblem(problemIdx);
+    if(problemInterval)clearInterval(problemInterval);
+    if(problems.length>1){
+        problemInterval=setInterval(()=>{problemIdx++;showProblem(problemIdx)},5000);
+    }
+}
 
 // ── SA Map (Leaflet) ────────────────────────────────────────
 let leafletMap=null,mapMarkers=[];
@@ -602,14 +742,14 @@ function buildMapMarkers(){
         const color=anyOff?'#ef4444':anyLow?'#fb923c':'#22c55e';
         const totalKwh=data.sites.reduce((s,d)=>s+(d.total_kwh||0),0);
 
-        // Create a custom div icon with glowing dot + count badge
+        // Single glowing orb with count inside
+        const size=count>1?36:22;
         const icon=L.divIcon({
             className:'',
-            iconSize:[40,40],
-            iconAnchor:[20,20],
-            html:`<div style="position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center">
-                <div style="width:18px;height:18px;border-radius:50%;background:${color};box-shadow:0 0 10px ${color},0 0 20px ${color}50;animation:map-pulse 2s infinite"></div>
-                ${count>1?`<div style="position:absolute;top:0;right:0;background:${color};color:#fff;font-size:9px;font-weight:700;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.4)">${count}</div>`:''}
+            iconSize:[size,size],
+            iconAnchor:[size/2,size/2],
+            html:`<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};box-shadow:0 0 12px ${color},0 0 24px ${color}60;display:flex;align-items:center;justify-content:center;animation:map-pulse 2s infinite;cursor:pointer">
+                ${count>1?`<span style="color:#fff;font-size:${count>=10?11:12}px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,0.5)">${count}</span>`:''}
             </div>`
         });
 
