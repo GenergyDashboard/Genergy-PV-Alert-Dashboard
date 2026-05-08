@@ -130,8 +130,9 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 #mapCardsRow::-webkit-scrollbar{height:4px}
 #mapCardsRow::-webkit-scrollbar-track{background:rgba(255,255,255,0.03)}
 #mapCardsRow::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
-.map-site-card{flex-shrink:0;width:160px;background:rgba(20,28,38,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;cursor:pointer;transition:all 0.2s;backdrop-filter:blur(8px)}
+.map-site-card{flex-shrink:0;width:180px;background:rgba(20,28,38,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 8px;cursor:pointer;transition:all 0.2s;backdrop-filter:blur(8px)}
 .map-site-card:hover{border-color:rgba(59,130,246,0.4);transform:translateY(-2px)}
+.map-card-chart{height:100px;position:relative;margin-top:4px}
 @keyframes map-pulse{0%,100%{box-shadow:0 0 10px currentColor,0 0 20px currentColor}50%{box-shadow:0 0 5px currentColor,0 0 10px transparent}}
 /* Scroll & refresh */
 .scroll-arrows{position:fixed;right:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:60}
@@ -251,6 +252,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
                 <option value="client">By Client Group</option>
             </select>
             <select id="mapCardGroup" onchange="renderMapCards()" style="background:rgba(15,20,25,0.8);border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#e2e8f0;padding:4px 8px;font-size:0.65rem;display:none"></select>
+            <button onclick="toggleMapCardMode()" id="mapCardModeBtn" style="background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.4);color:#60a5fa;border-radius:5px;padding:3px 8px;cursor:pointer;font-size:0.6rem;font-weight:600">30-Day Avg</button>
             <button onclick="mapCardsScroll(-1)" style="background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.1);color:#9ca3af;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:0.8rem">◀</button>
             <button onclick="mapCardsScroll(1)" style="background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.1);color:#9ca3af;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:0.8rem">▶</button>
         </div>
@@ -283,45 +285,6 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
         <div class="fleet-status-bar">
             <div class="fleet-status-label">Fleet Status</div>
             <div class="fleet-status-badges" id="statusBadges"></div>
-        </div>
-    </div>
-    <!-- Station count + Alarms + Problematic row -->
-    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-        <!-- Station Count (collapsible) -->
-        <div style="background:linear-gradient(135deg,#1a2332,#1e2936);border-radius:10px;padding:14px 18px;flex:1;min-width:180px;cursor:pointer" onclick="toggleStationDrop()">
-            <div style="display:flex;align-items:center;gap:10px">
-                <div style="display:flex;align-items:center;gap:6px">
-                    <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e"></div>
-                    <div style="width:10px;height:10px;border-radius:50%;background:#fb923c;box-shadow:0 0 6px #fb923c"></div>
-                    <div style="width:10px;height:10px;border-radius:50%;background:#6b7280;box-shadow:0 0 6px #6b7280"></div>
-                </div>
-                <div style="font-size:2rem;font-weight:700;color:#fff" id="stationCount">0</div>
-                <div style="color:#9ca3af;font-size:0.7rem">Station Number</div>
-                <div style="color:#4b5563;font-size:0.7rem;margin-left:auto" id="stationChev">▼</div>
-            </div>
-            <div id="stationDrop" style="display:none;margin-top:10px;max-height:200px;overflow-y:auto"></div>
-        </div>
-        <!-- Alarms donut -->
-        <div style="background:linear-gradient(135deg,#1a2332,#1e2936);border-radius:10px;padding:14px 18px;min-width:160px;text-align:center">
-            <div style="font-size:0.6rem;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Alarms</div>
-            <div style="position:relative;width:80px;height:80px;margin:0 auto">
-                <canvas id="alarmDonut" width="80" height="80"></canvas>
-                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column">
-                    <div style="font-size:1.4rem;font-weight:700;color:#fff" id="alarmTotal">0</div>
-                    <div style="font-size:0.5rem;color:#6b7280">Total Faults</div>
-                </div>
-            </div>
-            <div style="display:flex;justify-content:center;gap:12px;margin-top:8px;font-size:0.55rem">
-                <div><span style="color:#ef4444">●</span> <span style="color:#9ca3af">Fault</span> <span style="color:#fff;font-weight:700" id="alarmFault">0</span></div>
-                <div><span style="color:#fb923c">●</span> <span style="color:#9ca3af">Low</span> <span style="color:#fff;font-weight:700" id="alarmLow">0</span></div>
-                <div><span style="color:#3b82f6">●</span> <span style="color:#9ca3af">Stale</span> <span style="color:#fff;font-weight:700" id="alarmStale">0</span></div>
-            </div>
-        </div>
-        <!-- Problematic sites slideshow -->
-        <div style="background:linear-gradient(135deg,#1a2332,#1e2936);border-radius:10px;padding:14px 18px;min-width:260px;max-width:320px;overflow:hidden;position:relative">
-            <div style="font-size:0.6rem;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Problematic Sites</div>
-            <div id="problemSlide" style="transition:transform 0.6s ease"></div>
-            <div style="font-size:0.5rem;color:#4b5563;margin-top:6px" id="problemCount">--</div>
         </div>
     </div>
     <div class="controls">
@@ -648,21 +611,6 @@ function updateDashboard(silent=false){
     if(off)bh+=`<div class="fleet-badge off-b${statusFilter==='offline'?' active':''}" onclick="toggleStatus('offline')"><div class="bd"></div><div class="bc">${off} Offline</div></div>`;
     document.getElementById('statusBadges').innerHTML=bh;
     document.getElementById('lastUpdated').textContent=`Updated ${allSitesData.filter(s=>s.last_updated).map(s=>s.last_updated).sort().reverse()[0]||'N/A'}`;
-    // Station count
-    document.getElementById('stationCount').textContent=scope.length;
-    // Alarms
-    const faultCount=scope.filter(s=>!isStale(s)&&s.status==='offline'&&s.loaded).length;
-    const lowCount=scope.filter(s=>!isStale(s)&&s.status==='low').length;
-    const staleCount=scope.filter(s=>isStale(s)).length;
-    document.getElementById('alarmTotal').textContent=faultCount+lowCount+staleCount;
-    document.getElementById('alarmFault').textContent=faultCount;
-    document.getElementById('alarmLow').textContent=lowCount;
-    document.getElementById('alarmStale').textContent=staleCount;
-    drawAlarmDonut(faultCount,lowCount,staleCount);
-    // Station dropdown content
-    buildStationList(scope);
-    // Problematic sites slideshow
-    buildProblemSlide(scope);
     updateLegend();const scrollY=silent?window.scrollY:0;renderCards();if(silent)window.scrollTo(0,scrollY);
 }
 
@@ -722,86 +670,6 @@ function cOpts(y1Id,y1Max){const o={responsive:true,maintainAspectRatio:false,pl
 function switchMode(m){currentMode=m;cardOverrides={};document.getElementById('modeToday').classList.toggle('active',m==='today');document.getElementById('modeAvg').classList.toggle('active',m==='average');updateLegend();renderCards()}
 function toggleDrop(id){document.querySelectorAll('.dropdown-menu').forEach(m=>{if(m.id!==id)m.classList.remove('show')});document.getElementById(id).classList.toggle('show');if(id==='groupMenu')buildGroupMenu()}
 document.addEventListener('click',e=>{if(!e.target.closest('.dropdown'))document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('show'))});
-
-// ── Station dropdown ─────────────────────────────────────────
-let stationDropOpen=localStorage.getItem('g_stationDrop')==='1';
-function toggleStationDrop(){
-    stationDropOpen=!stationDropOpen;
-    localStorage.setItem('g_stationDrop',stationDropOpen?'1':'0');
-    document.getElementById('stationDrop').style.display=stationDropOpen?'block':'none';
-    document.getElementById('stationChev').textContent=stationDropOpen?'▲':'▼';
-}
-function buildStationList(scope){
-    const el=document.getElementById('stationDrop');
-    el.style.display=stationDropOpen?'block':'none';
-    document.getElementById('stationChev').textContent=stationDropOpen?'▲':'▼';
-    el.innerHTML=scope.map(s=>{
-        const st=isStale(s)?'offline':(s.status||'offline');
-        const c=st==='ok'?'#22c55e':st==='low'?'#fb923c':'#6b7280';
-        return`<div style="display:flex;align-items:center;gap:6px;padding:3px 0;font-size:0.68rem;cursor:pointer;color:#cbd5e1" onclick="event.stopPropagation();window.open('${s.dashboardUrl}','_blank')"><span style="width:6px;height:6px;border-radius:50%;background:${c};flex-shrink:0"></span>${s.name} <span style="color:#6b7280;margin-left:auto">${fmt(s.total_kwh||0)}</span></div>`;
-    }).join('');
-}
-
-// ── Alarm donut ─────────────────────────────────────────────
-function drawAlarmDonut(fault,low,stale){
-    const canvas=document.getElementById('alarmDonut');if(!canvas)return;
-    const ctx=canvas.getContext('2d');
-    const total=fault+low+stale;
-    const cx=40,cy=40,r=32,lw=8;
-    ctx.clearRect(0,0,80,80);
-    if(total===0){
-        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=lw;ctx.stroke();
-        return;
-    }
-    const segments=[{v:fault,c:'#ef4444'},{v:low,c:'#fb923c'},{v:stale,c:'#3b82f6'}];
-    let angle=-Math.PI/2;
-    segments.forEach(seg=>{
-        if(seg.v<=0)return;
-        const sweep=(seg.v/total)*Math.PI*2;
-        ctx.beginPath();ctx.arc(cx,cy,r,angle,angle+sweep);
-        ctx.strokeStyle=seg.c;ctx.lineWidth=lw;ctx.lineCap='round';ctx.stroke();
-        angle+=sweep+0.05;
-    });
-}
-
-// ── Problematic sites slideshow ─────────────────────────────
-let problemIdx=0,problemInterval=null;
-function buildProblemSlide(scope){
-    const problems=scope.filter(s=>{
-        const st=isStale(s)?'offline':(s.status||'offline');
-        return st==='low'||st==='offline';
-    });
-    const el=document.getElementById('problemSlide');
-    const countEl=document.getElementById('problemCount');
-    if(!problems.length){
-        el.innerHTML='<div style="color:#22c55e;font-size:0.75rem;padding:8px 0">✅ All sites operating normally</div>';
-        countEl.textContent='0 issues';
-        if(problemInterval){clearInterval(problemInterval);problemInterval=null}
-        return;
-    }
-    countEl.textContent=`${problems.length} issue${problems.length>1?'s':''}`;
-    // Show current problem
-    function showProblem(idx){
-        const s=problems[idx%problems.length];
-        const st=isStale(s)?'offline':(s.status||'offline');
-        const c=st==='low'?'#fb923c':'#ef4444';
-        const label=st==='low'?'LOW':'OFFLINE';
-        const ap=isStale(s)?null:(()=>{const stats=s.stats_30day||{},ha=stats.hourly_avg||[];const lh=s.last_hour||0;if(lh<5||!ha.length)return null;const exp=ha.slice(5,lh+1).reduce((a,b)=>a+b,0);return exp>=1?Math.round(getPv(s).slice(5,lh+1).reduce((a,b)=>a+b,0)/exp*100):null})();
-        el.innerHTML=`<div style="cursor:pointer" onclick="window.open('${s.dashboardUrl}','_blank')">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
-                <div style="font-weight:700;font-size:0.8rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.name}</div>
-                <span style="font-size:0.55rem;font-weight:700;color:${c}">${label}</span>
-            </div>
-            <div style="font-size:0.75rem;color:#fff;font-weight:600">${fmt(s.total_kwh||0)} kWh ${ap!==null?`<span style="color:${ap>=70?'#22c55e':ap>=40?'#fb923c':'#ef4444'};font-size:0.65rem">${ap}% of avg</span>`:''}</div>
-            <div style="font-size:0.5rem;color:#6b7280;margin-top:2px">${problems.length>1?`${(idx%problems.length)+1} of ${problems.length}`:''}</div>
-        </div>`;
-    }
-    showProblem(problemIdx);
-    if(problemInterval)clearInterval(problemInterval);
-    if(problems.length>1){
-        problemInterval=setInterval(()=>{problemIdx++;showProblem(problemIdx)},5000);
-    }
-}
 
 // ── SA Map (Leaflet) ────────────────────────────────────────
 let leafletMap=null,mapMarkers=[],alarmSlideIdx=0,alarmSlideTimer=null;
@@ -879,21 +747,59 @@ function buildMapMarkers(){
         marker.bindPopup(popupHtml,{className:'dark-popup',maxWidth:280});mapMarkers.push(marker)});
 }
 // Bottom cards
+let mapCardMode='average',mapCardCharts={};
+function toggleMapCardMode(){
+    mapCardMode=mapCardMode==='today'?'average':'today';
+    document.getElementById('mapCardModeBtn').textContent=mapCardMode==='today'?'Bar Graph':'30-Day Avg';
+    renderMapCards();
+}
 function renderMapCards(){
+    // Destroy old charts
+    Object.values(mapCardCharts).forEach(c=>c.destroy());mapCardCharts={};
     const filter=document.getElementById('mapCardFilter').value,groupSel=document.getElementById('mapCardGroup');let sites=allSitesData;
     if(filter==='location'){const locs=[...new Set(allSitesData.map(s=>s.location).filter(Boolean))].sort();groupSel.style.display='inline';groupSel.innerHTML=`<option value="">All Locations</option>`+locs.map(l=>`<option value="${l}">${l}</option>`).join('');if(groupSel.value)sites=sites.filter(s=>s.location===groupSel.value)}
     else if(filter==='client'){const gn=Object.keys(ldGrp());groupSel.style.display='inline';groupSel.innerHTML=`<option value="">All Groups</option>`+gn.map(g=>`<option value="${g}">${g}</option>`).join('');if(groupSel.value)sites=sites.filter(s=>(ldGrp()[groupSel.value]||[]).includes(s.name))}
     else{groupSel.style.display='none'}
     const row=document.getElementById('mapCardsRow');
-    row.innerHTML=sites.map(s=>{const st=isStale(s)?'offline':(s.status||'offline');const c=st==='ok'?'#22c55e':st==='low'?'#fb923c':'#6b7280';const kwh=s.total_kwh||0;
+    row.innerHTML=sites.map((s,i)=>{const st=isStale(s)?'offline':(s.status||'offline');const c=st==='ok'?'#22c55e':st==='low'?'#fb923c':'#6b7280';const kwh=s.total_kwh||0;
         const y=getYesterday(s),yBH=y.byHour,gP=yBH>0?Math.round((kwh/yBH)*100)+'%':'--';
         const irP=(()=>{const ir=getIr(s),avg=(s.stats_30day||{}).hourly_irrad_avg||[];const lh=s.last_hour||0;if(lh<5||!avg.length)return'--';const tC=ir.slice(5,lh+1).reduce((a,b)=>a+b,0),aC=avg.slice(5,lh+1).reduce((a,b)=>a+b,0);return aC>=10?Math.round((tC/aC)*100)+'%':'--'})();
         return`<div class="map-site-card" onclick="window.open('${s.dashboardUrl}','_blank')">
-            <div style="display:flex;align-items:center;gap:3px;margin-bottom:3px"><span style="width:6px;height:6px;border-radius:50%;background:${c}"></span><span style="font-size:0.6rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">${s.name}</span></div>
-            <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:0.8rem;font-weight:700;color:#fff">${fmt(kwh,1)} <span style="font-size:0.5rem;color:#9ca3af">kWh</span></div><div style="font-size:0.5rem;color:${c};font-weight:700">${st.toUpperCase()}</div></div>
-            <div style="display:flex;justify-content:space-between;font-size:0.48rem;color:#6b7280;margin-top:2px"><span>Yest: ${fmtI(yBH)} (${gP})</span><span style="color:#eab308">Irr: ${irP}</span></div></div>`}).join('');
+            <div style="display:flex;align-items:center;gap:3px;margin-bottom:2px"><span style="width:6px;height:6px;border-radius:50%;background:${c}"></span><span style="font-size:0.58rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">${s.name}</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:0.75rem;font-weight:700;color:#fff">${fmt(kwh,1)} <span style="font-size:0.45rem;color:#9ca3af">kWh</span></div><div style="font-size:0.45rem;color:${c};font-weight:700">${st.toUpperCase()}</div></div>
+            <div style="display:flex;justify-content:space-between;font-size:0.45rem;color:#6b7280"><span>Yest: ${fmtI(yBH)} (${gP})</span><span style="color:#eab308">Irr: ${irP}</span></div>
+            <div class="map-card-chart"><canvas id="mc-${i}"></canvas></div>
+        </div>`}).join('');
+    // Draw mini charts after DOM update
+    setTimeout(()=>{
+        sites.forEach((s,i)=>{
+            const canvas=document.getElementById(`mc-${i}`);if(!canvas)return;
+            const ctx=canvas.getContext('2d');
+            const stats=s.stats_30day||{};
+            const pv=slH(getPv(s)),ir=slH(getIr(s)),avgIr=slH(stats.hourly_irrad_avg||new Array(24).fill(0));
+            let datasets;
+            if(mapCardMode==='today'){
+                const maxIr=Math.max(...ir,...avgIr,1);
+                datasets=[
+                    {type:'line',data:avgIr,backgroundColor:'rgba(234,179,8,0.1)',borderColor:'rgba(234,179,8,0.2)',borderWidth:0.5,fill:true,yAxisID:'y1',pointRadius:0,tension:0.4,order:4},
+                    {type:'line',data:ir,borderColor:'#eab308',borderWidth:1,borderDash:[3,2],fill:false,yAxisID:'y1',pointRadius:0,tension:0.4,order:3},
+                    {type:'line',data:slH(stats.hourly_avg||new Array(24).fill(0)),borderColor:'rgba(96,165,250,0.5)',borderWidth:0.8,borderDash:[2,2],fill:false,pointRadius:0,tension:0.4,order:1},
+                    {type:'bar',data:pv,backgroundColor:'#22c55e',borderWidth:0,barPercentage:0.8,categoryPercentage:0.9,order:2}
+                ];
+                mapCardCharts[`mc-${i}`]=new Chart(ctx,{type:'bar',data:{labels:CHART_LABELS,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false,beginAtZero:true},y1:{display:false,beginAtZero:true,max:maxIr/0.7}}}});
+            } else {
+                datasets=[
+                    {type:'line',data:slH(stats.hourly_p25||new Array(24).fill(0)),backgroundColor:'rgba(34,197,94,0.15)',borderColor:'rgba(34,197,94,0.3)',borderWidth:0.5,fill:'+1',pointRadius:0,tension:0.4,order:4},
+                    {type:'line',data:slH(stats.hourly_p75||new Array(24).fill(0)),backgroundColor:'transparent',borderColor:'rgba(34,197,94,0.3)',borderWidth:0.5,pointRadius:0,tension:0.4,order:4},
+                    {type:'line',data:slH(stats.hourly_avg||new Array(24).fill(0)),borderColor:'#60a5fa',borderWidth:1,borderDash:[3,2],fill:false,pointRadius:0,tension:0.4,order:2},
+                    {type:'line',data:trunc(pv),borderColor:'#22c55e',borderWidth:1.5,fill:false,pointRadius:0,tension:0.4,order:1}
+                ];
+                mapCardCharts[`mc-${i}`]=new Chart(ctx,{type:'bar',data:{labels:CHART_LABELS,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false,beginAtZero:true}}}});
+            }
+        });
+    },100);
 }
 function mapCardsScroll(dir){document.getElementById('mapCardsRow').scrollBy({left:dir*340,behavior:'smooth'})}
 </script>
 </body>
-                            </html>
+</html>
