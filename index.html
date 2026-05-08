@@ -451,6 +451,7 @@ const ALL_SITES=[
 {name:"1st Avenue Spar",platform:"fusionsolar",format:"1stavespar",location:"Gqeberha",province:"Eastern Cape",lat:-33.96,lon:25.60,
     dataUrl:`${BASE}/1stAveSpar/data/today_detailed.json`,
     metaUrl:`${BASE}/1stAveSpar/data/last_scrape.json`,
+    historyUrl:`${BASE}/1stAveSpar/data/history.json`,
     dashboardUrl:`${BASE}/1stAveSpar/`},
 ];
 
@@ -470,25 +471,68 @@ function todaySAST(){const n=new Date();const s=new Date(n.getTime()+(2*60-n.get
 function isStale(site){if(!site.loaded||!site.date)return true;return site.date!==todaySAST()}
 function getHistDate(site,dateStr){return(site.history||{})[dateStr]||null}
 
-function normalize1stAve(hourlyArr,meta,site){
+function normalize1stAve(hourlyArr,meta,histData,site){
     const pv=new Array(24).fill(0),ir=new Array(24).fill(0),avgPv=new Array(24).fill(0);
     if(Array.isArray(hourlyArr))hourlyArr.forEach(h=>{const hr=h.hour||0;if(hr>=0&&hr<24){pv[hr]=h.pv_kw||0;ir[hr]=h.irradiation_wm2||0;avgPv[hr]=h.predicted_kw||0}});
     const total=pv.reduce((a,b)=>a+b,0);let lastHour=0;for(let i=23;i>=0;i--)if(pv[i]>0){lastHour=i;break}
     const date=meta?.date||todaySAST();
     const isToday=date===todaySAST();
-    // Only grace period: 05:00-07:00 SAST, show as today with 0 kWh while waiting for first scrape
     const nowH=new Date(new Date().getTime()+(2*60-new Date().getTimezoneOffset())*60000).getHours();
     let useDate=date,usePv=pv,useIr=ir,useTotal=total;
     if(!isToday&&nowH>=5&&nowH<=7){useDate=todaySAST();useTotal=0;usePv=new Array(24).fill(0);useIr=new Array(24).fill(0)}
-    // Outside grace period (including overnight 00:00-04:59), use actual date — will show STALE which is correct
+
+    // Build history from fetched history.json + today's data
+    const history=histData&&typeof histData==='object'?{...histData}:{};
+    // Always add/update today's entry from live data
+    history[date]={total_kwh:total,hourly:pv,irradiation:ir,last_hour:lastHour};
+
+    // Compute 30-day stats from history
+    const dates=Object.keys(history).sort();
+    const nDays=dates.length;
+    const hourlyAvg=new Array(24).fill(0),hourlyMin=new Array(24).fill(Infinity),hourlyMax=new Array(24).fill(0);
+    const hourlyP25=new Array(24).fill(0),hourlyP75=new Array(24).fill(0);
+    const hourlyIrradAvg=new Array(24).fill(0);
+    const hourlyVals=Array.from({length:24},()=>[]);
+    let dailyTotals=[];
+
+    dates.forEach(d=>{
+        const dd=history[d];if(!dd)return;
+        const dh=dd.hourly||[];const di=dd.irradiation||[];
+        dailyTotals.push(dd.total_kwh||0);
+        for(let h=0;h<24;h++){
+            const v=dh[h]||0;
+            hourlyVals[h].push(v);
+            hourlyAvg[h]+=v;
+            hourlyIrradAvg[h]+=(di[h]||0);
+            if(v<hourlyMin[h])hourlyMin[h]=v;
+            if(v>hourlyMax[h])hourlyMax[h]=v;
+        }
+    });
+    for(let h=0;h<24;h++){
+        hourlyAvg[h]=nDays>0?Math.round(hourlyAvg[h]/nDays*100)/100:0;
+        hourlyIrradAvg[h]=nDays>0?Math.round(hourlyIrradAvg[h]/nDays*10)/10:0;
+        if(hourlyMin[h]===Infinity)hourlyMin[h]=0;
+        // Percentiles
+        const sorted=[...hourlyVals[h]].sort((a,b)=>a-b);
+        if(sorted.length>=4){
+            hourlyP25[h]=sorted[Math.floor(sorted.length*0.25)];
+            hourlyP75[h]=sorted[Math.floor(sorted.length*0.75)];
+        } else {
+            hourlyP25[h]=hourlyMin[h];hourlyP75[h]=hourlyMax[h];
+        }
+    }
+    const dailyAvg=dailyTotals.length>0?dailyTotals.reduce((a,b)=>a+b,0)/dailyTotals.length:0;
+    const dailyMin=dailyTotals.length>0?Math.min(...dailyTotals):0;
+    const dailyMax=dailyTotals.length>0?Math.max(...dailyTotals):0;
+
     return{...site,loaded:true,plant:'1st Avenue Spar',last_updated:meta?.timestamp||'N/A',date:useDate,
         total_kwh:Math.round(useTotal*10)/10,last_hour:isToday?lastHour:0,status:useTotal>0?'ok':'offline',
         alerts:{offline:useTotal<=0,pace_low:false,total_low:false},
         today:{hourly_pv:usePv,irradiation:useIr},hourly_pv:usePv,irradiation:useIr,
-        stats_30day:{hourly_avg:avgPv,hourly_min:new Array(24).fill(0),hourly_max:new Array(24).fill(0),
-            hourly_p10:new Array(24).fill(0),hourly_p25:new Array(24).fill(0),hourly_p75:new Array(24).fill(0),hourly_p90:new Array(24).fill(0),
-            hourly_irrad_avg:ir,daily_min:0,daily_max:0,daily_avg:avgPv.reduce((a,b)=>a+b,0),sample_days:1},
-        history:{[date]:{total_kwh:total,hourly:pv,irradiation:ir,last_hour:lastHour}}};
+        stats_30day:{hourly_avg:hourlyAvg,hourly_min:hourlyMin,hourly_max:hourlyMax,
+            hourly_p10:hourlyP25,hourly_p25:hourlyP25,hourly_p75:hourlyP75,hourly_p90:hourlyP75,
+            hourly_irrad_avg:hourlyIrradAvg,daily_min:dailyMin,daily_max:dailyMax,daily_avg:Math.round(dailyAvg*10)/10,sample_days:nDays},
+        history:history};
 }
 
 function getYesterday(site){const h=site.history||{},d=Object.keys(h).sort();if(d.length<2)return{full:0,byHour:0};const yd=d[d.length-2],yD=h[yd]||{};const lh=site.last_hour||0;return{full:yD.total_kwh||0,byHour:(yD.hourly||new Array(24).fill(0)).slice(0,lh+1).reduce((a,b)=>a+b,0)}}
@@ -508,8 +552,10 @@ async function loadAllSites(silent=false){
     const promises=ALL_SITES.map(async site=>{
         try{
             if(site.format==='1stavespar'){
-                const[hR,mR]=await Promise.all([fetch(site.dataUrl),fetch(site.metaUrl)]);
-                if(!hR.ok)throw 0;return normalize1stAve(await hR.json(),mR.ok?await mR.json():null,site);
+                const[hR,mR,hiR]=await Promise.all([fetch(site.dataUrl),fetch(site.metaUrl),fetch(site.historyUrl)]);
+                if(!hR.ok)throw 0;
+                const hist=hiR.ok?await hiR.json():null;
+                return normalize1stAve(await hR.json(),mR.ok?await mR.json():null,hist,site);
             }
             const r=await fetch(site.dataUrl);if(!r.ok)throw 0;return{...site,...(await r.json()),loaded:true};
         }catch(e){return{...site,loaded:false,status:'offline',total_kwh:0,last_updated:null,today:{hourly_pv:new Array(24).fill(0),irradiation:new Array(24).fill(0)},hourly_pv:new Array(24).fill(0),stats_30day:{},history:{}}}
@@ -807,4 +853,4 @@ function renderMapCards(){
 function mapCardsScroll(dir){document.getElementById('mapCardsRow').scrollBy({left:dir*340,behavior:'smooth'})}
 </script>
 </body>
-</html>
+                </html>
