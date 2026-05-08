@@ -125,8 +125,8 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 .map-close:hover{color:#fff;background:rgba(59,130,246,0.3)}
 .map-svg-wrap{position:relative;display:inline-block}
 .map-svg-wrap svg{max-width:100%;height:auto}
-.map-svg-wrap svg path.province{fill:rgba(30,41,54,0.9);stroke:rgba(255,255,255,0.6);stroke-width:1;transition:fill 0.3s}
-.map-svg-wrap svg path.province:hover{fill:rgba(40,55,75,0.9)}
+.map-svg-wrap svg path.province{fill:rgba(20,28,38,0.95);stroke:rgba(255,255,255,0.45);stroke-width:0.8;transition:fill 0.3s}
+.map-svg-wrap svg path.province:hover{fill:rgba(30,42,58,0.95)}
 .map-svg-wrap svg text{fill:rgba(255,255,255,0.35);font-size:8px;font-family:'Segoe UI',sans-serif;pointer-events:none}
 /* Map dots */
 .map-dot{position:absolute;cursor:pointer;transform:translate(-50%,-50%);z-index:10}
@@ -175,27 +175,37 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
         <h2>Site Map — South Africa</h2>
         <div class="sub">Click a region to view sites</div>
         <div class="map-svg-wrap" id="mapWrap">
-            <svg viewBox="0 0 600 520" xmlns="http://www.w3.org/2000/svg" id="saMap">
-                <!-- SA Provinces - simplified outlines -->
-                <path class="province" d="M55,350 L90,280 L130,250 L180,230 L210,250 L220,310 L250,350 L280,380 L260,420 L220,440 L170,460 L120,450 L80,420 L50,390Z" data-p="Western Cape"/>
-                <path class="province" d="M280,380 L250,350 L220,310 L210,250 L260,220 L310,200 L360,210 L400,250 L420,300 L440,350 L430,400 L390,430 L340,440 L300,420Z" data-p="Eastern Cape"/>
-                <path class="province" d="M130,250 L180,230 L210,250 L260,220 L310,200 L350,160 L310,120 L250,90 L190,70 L130,50 L80,80 L50,130 L55,200 L90,280Z" data-p="Northern Cape"/>
-                <path class="province" d="M310,200 L350,160 L370,120 L400,100 L430,120 L420,170 L400,200 L360,210Z" data-p="Free State"/>
-                <path class="province" d="M400,100 L430,120 L420,170 L440,160 L470,130 L480,100 L460,70 L430,60 L400,70Z" data-p="Gauteng"/>
-                <path class="province" d="M430,120 L420,170 L400,200 L360,210 L400,250 L420,300 L460,280 L500,240 L520,200 L510,160 L480,130 L470,130 L440,160Z" data-p="KwaZulu-Natal"/>
-                <path class="province" d="M370,120 L400,100 L400,70 L430,60 L440,40 L400,20 L350,30 L310,50 L310,120 L350,160Z" data-p="North West"/>
-                <path class="province" d="M430,60 L460,70 L480,100 L510,80 L530,50 L540,20 L500,10 L460,15 L440,40Z" data-p="Mpumalanga"/>
-                <path class="province" d="M440,40 L460,15 L500,10 L540,20 L550,50 L530,50 L510,80 L480,100 L470,130 L480,130 L510,160 L520,130 L540,100 L560,60 L550,30 L530,10 L480,5 L450,10Z" data-p="Limpopo"/>
+            <svg viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg" id="saMap">
+                <rect width="680" height="520" fill="#1a2332"/>
+                <!-- Provinces -->
+                <path class="province" d="M87,494 L106,479 L110,461 L98,446 L91,427 L102,420 L125,401 L128,379 L140,371 L162,383 L189,401 L227,427 L246,438 L261,446 L283,453 L321,461 L359,457 L382,461 L397,464 L389,472 L378,483 L359,494 L321,494 L246,501 L189,494 L151,479 L113,483Z" data-p="Western Cape"/>
+                <path class="province" d="M397,464 L382,461 L359,457 L321,461 L283,453 L261,446 L246,427 L264,409 L321,390 L359,371 L397,353 L434,342 L453,316 L472,323 L491,334 L510,353 L529,371 L518,390 L502,409 L484,427 L453,446 L442,457 L416,464Z" data-p="Eastern Cape"/>
+                <path class="province" d="M140,371 L128,379 L125,401 L102,420 L91,427 L98,446 L110,461 L106,479 L87,494 L38,464 L38,390 L49,297 L57,271 L83,264 L113,260 L144,267 L170,264 L189,234 L189,204 L208,197 L238,186 L264,149 L283,130 L321,149 L340,167 L340,204 L340,223 L340,241 L348,260 L359,279 L351,297 L340,316 L321,334 L321,353 L283,371 L264,390 L264,409 L246,427 L227,438 L189,401 L162,383Z" data-p="Northern Cape"/>
+                <path class="province" d="M321,334 L340,316 L351,297 L359,279 L348,260 L340,241 L340,223 L340,204 L378,186 L416,167 L434,175 L453,186 L472,204 L491,223 L510,241 L518,260 L529,279 L529,297 L529,316 L510,316 L491,316 L453,316 L434,342 L397,353 L359,371 L321,390 L321,353Z" data-p="Free State"/>
+                <path class="province" d="M529,316 L529,297 L529,279 L518,260 L529,241 L529,223 L548,204 L567,204 L586,212 L604,223 L623,241 L635,260 L623,279 L604,297 L586,316 L567,334 L548,353 L540,371 L529,371 L510,353 L491,334 L491,316 L510,316Z" data-p="KwaZulu-Natal"/>
+                <path class="province" d="M453,186 L434,175 L453,167 L465,149 L472,141 L491,149 L510,160 L510,167 L502,186 L491,204 L472,204Z" data-p="Gauteng"/>
+                <path class="province" d="M510,160 L491,149 L472,141 L491,130 L510,111 L529,111 L567,130 L586,149 L604,167 L604,186 L586,204 L567,204 L548,204 L529,223 L529,241 L491,223 L491,204 L472,204 L502,186 L510,167Z" data-p="Mpumalanga"/>
+                <path class="province" d="M510,111 L491,111 L472,93 L453,74 L434,56 L434,37 L453,26 L472,19 L510,26 L529,37 L548,48 L567,56 L586,74 L604,93 L604,111 L604,130 L586,149 L567,130 L529,111Z" data-p="Limpopo"/>
+                <path class="province" d="M340,204 L340,167 L321,149 L340,130 L359,111 L378,93 L397,74 L434,56 L453,74 L472,93 L491,111 L491,130 L472,141 L465,149 L453,167 L434,175 L453,186 L378,186Z" data-p="North West"/>
+                <!-- Neighboring countries -->
+                <text x="30" y="220" style="fill:rgba(255,255,255,0.25);font-size:11px;font-weight:600;letter-spacing:2px">NAMIBIA</text>
+                <text x="320" y="50" style="fill:rgba(255,255,255,0.25);font-size:11px;font-weight:600;letter-spacing:2px">BOTSWANA</text>
+                <text x="540" y="20" style="fill:rgba(255,255,255,0.25);font-size:9px;font-weight:600;letter-spacing:1px">MOZAMBIQUE</text>
+                <text x="590" y="190" style="fill:rgba(255,255,255,0.2);font-size:9px;font-weight:600;letter-spacing:1px">ESWATINI</text>
+                <text x="475" y="280" style="fill:rgba(255,255,255,0.2);font-size:9px;font-weight:600;letter-spacing:1px">LESOTHO</text>
                 <!-- Province labels -->
-                <text x="160" y="380">Western Cape</text>
-                <text x="330" y="340">Eastern Cape</text>
-                <text x="160" y="150">Northern Cape</text>
-                <text x="350" y="160">Free State</text>
-                <text x="445" y="100">Gauteng</text>
-                <text x="460" y="230">KwaZulu-Natal</text>
-                <text x="340" y="70">North West</text>
-                <text x="490" y="50">Mpumalanga</text>
-                <text x="500" y="15">Limpopo</text>
+                <text x="170" y="470" style="fill:rgba(255,255,255,0.18);font-size:8px;font-weight:500">Western Cape</text>
+                <text x="380" y="420" style="fill:rgba(255,255,255,0.18);font-size:8px;font-weight:500">Eastern Cape</text>
+                <text x="160" y="320" style="fill:rgba(255,255,255,0.18);font-size:8px;font-weight:500">Northern Cape</text>
+                <text x="380" y="295" style="fill:rgba(255,255,255,0.18);font-size:8px;font-weight:500">Free State</text>
+                <text x="460" y="175" style="fill:rgba(255,255,255,0.18);font-size:7px;font-weight:500">Gauteng</text>
+                <text x="550" y="300" style="fill:rgba(255,255,255,0.18);font-size:7px;font-weight:500">KZN</text>
+                <text x="510" y="150" style="fill:rgba(255,255,255,0.18);font-size:7px;font-weight:500">Mpumalanga</text>
+                <text x="490" y="75" style="fill:rgba(255,255,255,0.18);font-size:7px;font-weight:500">Limpopo</text>
+                <text x="370" y="130" style="fill:rgba(255,255,255,0.18);font-size:7px;font-weight:500">North West</text>
+                <!-- Johannesburg marker -->
+                <circle cx="474" cy="175" r="3" fill="rgba(255,255,255,0.3)"/>
+                <text x="480" y="172" style="fill:rgba(255,255,255,0.35);font-size:7px">Johannesburg</text>
             </svg>
             <div id="mapDots"></div>
         </div>
@@ -255,7 +265,13 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
             <button onclick="goToToday()" style="background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.3);color:#22c55e" title="Jump to today">Today</button>
         </div>
         <span style="color:#374151">|</span>
-        <button class="ctrl-btn" id="rotateBtn" onclick="toggleRotate()" title="Auto-rotate through groups every 15s">▶ Rotate</button>
+        <div class="dropdown" id="rotateDrop">
+            <button class="ctrl-btn" id="rotateBtn" onclick="toggleRotate()" title="Auto-rotate through groups every 15s">▶ Rotate</button>
+            <select id="rotateType" style="background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#9ca3af;padding:4px 6px;font-size:0.65rem;cursor:pointer" title="Rotate by">
+                <option value="client">Client Groups</option>
+                <option value="location">Locations</option>
+            </select>
+        </div>
     </div>
     <div class="legend-bar" id="legendBar"></div>
     <div id="sitesContainer" class="sites-grid"><div class="loading">Loading site data...</div></div>
@@ -469,10 +485,19 @@ function goToToday(){document.getElementById('datePicker').value=todaySAST();vie
 
 // ── Auto-rotate ─────────────────────────────────────────────
 function toggleRotate(){
-    if(rotateInterval){clearInterval(rotateInterval);rotateInterval=null;document.getElementById('rotateBtn').classList.remove('rotate-active');document.getElementById('rotateBtn').textContent='▶ Rotate';return}
-    const groups=ldGrp(),gn=Object.keys(groups);
-    if(!gn.length){alert('Create client groups first');return}
-    rotateGroups=gn;rotateIdx=0;
+    if(rotateInterval){clearInterval(rotateInterval);rotateInterval=null;document.getElementById('rotateBtn').classList.remove('rotate-active');document.getElementById('rotateBtn').textContent='▶ Rotate';clearAllFilters();return}
+    const rotateType=document.getElementById('rotateType').value;
+    if(rotateType==='client'){
+        const groups=ldGrp(),gn=Object.keys(groups);
+        if(!gn.length){alert('Create client groups first');return}
+        rotateGroups=gn;
+    } else {
+        // Rotate by location — get unique locations from loaded sites
+        const locs=[...new Set(allSitesData.map(s=>s.location).filter(Boolean))].sort();
+        if(!locs.length){alert('No location data');return}
+        rotateGroups=locs;
+    }
+    rotateIdx=0;
     document.getElementById('rotateBtn').classList.add('rotate-active');
     document.getElementById('rotateBtn').textContent='⏸ Rotate';
     doRotateStep();
@@ -480,19 +505,36 @@ function toggleRotate(){
 }
 function doRotateStep(){
     if(!rotateGroups.length)return;
+    const rotateType=document.getElementById('rotateType').value;
     const gName=rotateGroups[rotateIdx%rotateGroups.length];
     rotateIdx++;
-    // Uncheck all group checkboxes then check this one
-    document.querySelectorAll('#groupMenu input[type=checkbox]').forEach(c=>c.checked=false);
-    buildGroupMenu();
-    // Find and check the right checkbox
+    const grid=document.getElementById('sitesContainer');
+    grid.classList.add('fading');
     setTimeout(()=>{
-        const cbs=document.querySelectorAll('#groupMenu input[type=checkbox]');
-        cbs.forEach(c=>{if(c.value===gName)c.checked=true});
-        const grid=document.getElementById('sitesContainer');
-        grid.classList.add('fading');
-        setTimeout(()=>{applyFilters();grid.classList.remove('fading');window.scrollTo({top:0,behavior:'smooth'})},300);
-    },50);
+        if(rotateType==='client'){
+            // Check the matching client group checkbox
+            document.querySelectorAll('#groupMenu input[type=checkbox]').forEach(c=>c.checked=false);
+            buildGroupMenu();
+            setTimeout(()=>{
+                document.querySelectorAll('#groupMenu input[type=checkbox]').forEach(c=>{if(c.value===gName)c.checked=true});
+                applyFilters();
+                grid.classList.remove('fading');
+                window.scrollTo({top:0,behavior:'smooth'});
+            },50);
+        } else {
+            // Location mode — filter by location name directly
+            clearAllFilters();
+            // Override siteVisible temporarily
+            const locFilter=gName;
+            allSitesData.forEach(s=>{
+                const cid=`c-${s.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`;
+                const card=document.querySelector(`[id="${CSS.escape(cid)}"]`)?.closest('.site-card');
+                if(card){card.classList.toggle('hidden',s.location!==locFilter)}
+            });
+            grid.classList.remove('fading');
+            window.scrollTo({top:0,behavior:'smooth'});
+        }
+    },300);
 }
 
 // ── Dashboard update ────────────────────────────────────────
@@ -581,36 +623,33 @@ function closeMap(){document.getElementById('mapOverlay').classList.remove('show
 
 function buildMapDots(){
     const dotsEl=document.getElementById('mapDots');dotsEl.innerHTML='';
-    // Group sites by location
     const locs={};
     allSitesData.forEach(s=>{
         const k=s.location||'Unknown';
         if(!locs[k])locs[k]={sites:[],lat:s.lat||0,lon:s.lon||0,province:s.province||''};
         locs[k].sites.push(s);
     });
-    const svg=document.getElementById('saMap');
-    const svgRect=svg.getBoundingClientRect();
-    const wrap=document.getElementById('mapWrap');
-    const wRect=wrap.getBoundingClientRect();
-
+    // Convert lat/lon to % within SVG viewBox (680x520)
+    // SA bounds: lat -21.5 to -35.5, lon 15.5 to 33.5
+    function toXY(lat,lon){
+        return{
+            x:((lon-15.5)/(33.5-15.5))*100,
+            y:((lat-(-21.5))/((-35.5)-(-21.5)))*100
+        };
+    }
     Object.entries(locs).forEach(([locName,data])=>{
-        // Convert lat/lon to SVG coordinates (approximate mapping)
-        // SA roughly: lat -22 to -35, lon 16 to 33
-        const xPct=(data.lon-16)/(33-16);
-        const yPct=(data.lat-(-22))/((-35)-(-22));
-        const x=xPct*100;const y=yPct*100;
-
-        // Determine status
+        const{x,y}=toXY(data.lat,data.lon);
         const allOk=data.sites.every(s=>!isStale(s)&&s.status==='ok');
         const anyLow=data.sites.some(s=>!isStale(s)&&s.status==='low');
         const anyOff=data.sites.some(s=>isStale(s)||s.status==='offline'||!s.loaded);
         const statusClass=anyOff?'error':anyLow?'warn':'ok';
-
+        const count=data.sites.length;
         const dot=document.createElement('div');
         dot.className='map-dot';
         dot.style.left=x+'%';dot.style.top=y+'%';
-        dot.innerHTML=`<div class="map-dot-inner ${statusClass}" style="color:${statusClass==='ok'?'#22c55e':statusClass==='warn'?'#fb923c':'#ef4444'}"></div><div class="map-dot-label">${locName} <span class="map-dot-count">(${data.sites.length})</span></div><div class="map-dropdown" id="md-${locName.replace(/[^a-zA-Z0-9]/g,'')}"></div>`;
-
+        // Show count badge if more than 1 site
+        const badge=count>1?`<div style="position:absolute;top:-6px;right:-8px;background:${statusClass==='ok'?'#22c55e':statusClass==='warn'?'#fb923c':'#ef4444'};color:#fff;font-size:0.5rem;font-weight:700;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center">${count}</div>`:'';
+        dot.innerHTML=`<div class="map-dot-inner ${statusClass}" style="color:${statusClass==='ok'?'#22c55e':statusClass==='warn'?'#fb923c':'#ef4444'}">${badge}</div><div class="map-dot-label">${locName}</div><div class="map-dropdown" id="md-${locName.replace(/[^a-zA-Z0-9]/g,'')}"></div>`;
         dot.onclick=(e)=>{
             e.stopPropagation();
             const dd=dot.querySelector('.map-dropdown');
@@ -626,7 +665,6 @@ function buildMapDots(){
         };
         dotsEl.appendChild(dot);
     });
-    // Close dropdowns on map click
     document.getElementById('mapOverlay').onclick=(e)=>{if(!e.target.closest('.map-dot'))document.querySelectorAll('.map-dropdown.show').forEach(d=>d.classList.remove('show'))};
 }
 </script>
