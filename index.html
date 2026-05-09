@@ -557,7 +557,10 @@ async function loadAllSites(silent=false){
                 const hist=hiR.ok?await hiR.json():null;
                 return normalize1stAve(await hR.json(),mR.ok?await mR.json():null,hist,site);
             }
-            const r=await fetch(site.dataUrl);if(!r.ok)throw 0;return{...site,...(await r.json()),loaded:true};
+            const r=await fetch(site.dataUrl);if(!r.ok)throw 0;const d={...site,...(await r.json()),loaded:true};
+                // Override: 0 generation = offline, not OK
+                if((d.total_kwh||0)<=0&&d.status==='ok')d.status='offline';
+                return d;
         }catch(e){return{...site,loaded:false,status:'offline',total_kwh:0,last_updated:null,today:{hourly_pv:new Array(24).fill(0),irradiation:new Array(24).fill(0)},hourly_pv:new Array(24).fill(0),stats_30day:{},history:{}}}
     });
     allSitesData=await Promise.all(promises);
@@ -853,4 +856,4 @@ function renderMapCards(){
 function mapCardsScroll(dir){document.getElementById('mapCardsRow').scrollBy({left:dir*340,behavior:'smooth'})}
 </script>
 </body>
-                </html>
+</html>
