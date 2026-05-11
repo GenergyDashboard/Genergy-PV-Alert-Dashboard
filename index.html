@@ -118,7 +118,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 /* Map */
 .map-overlay{position:fixed;inset:0;background:#0a0e14;z-index:500;display:none;overflow:hidden}
 .map-overlay.show{display:block}
-.map-close{position:absolute;top:10px;right:260px;color:#9ca3af;font-size:1.2rem;cursor:pointer;z-index:600;background:rgba(15,20,25,0.8);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15)}
+.map-close{position:absolute;top:10px;right:310px;color:#9ca3af;font-size:1.2rem;cursor:pointer;z-index:600;background:rgba(15,20,25,0.8);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15)}
 .map-close:hover{color:#fff;background:rgba(59,130,246,0.3)}
 .dark-popup .leaflet-popup-content-wrapper{background:transparent!important;box-shadow:none!important;border:none!important;padding:0!important}
 .dark-popup .leaflet-popup-content{margin:0!important}
@@ -130,9 +130,9 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 #mapCardsRow::-webkit-scrollbar{height:4px}
 #mapCardsRow::-webkit-scrollbar-track{background:rgba(255,255,255,0.03)}
 #mapCardsRow::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
-.map-site-card{flex-shrink:0;width:180px;background:rgba(20,28,38,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 8px;cursor:pointer;transition:all 0.2s;backdrop-filter:blur(8px)}
+.map-site-card{flex-shrink:0;width:300px;background:rgba(20,28,38,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 10px;cursor:pointer;transition:all 0.2s;backdrop-filter:blur(8px)}
 .map-site-card:hover{border-color:rgba(59,130,246,0.4);transform:translateY(-2px)}
-.map-card-chart{height:100px;position:relative;margin-top:4px}
+.map-card-chart{height:180px;position:relative;margin-top:4px}
 @keyframes map-pulse{0%,100%{box-shadow:0 0 10px currentColor,0 0 20px currentColor}50%{box-shadow:0 0 5px currentColor,0 0 10px transparent}}
 /* Scroll & refresh */
 .scroll-arrows{position:fixed;right:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:60}
@@ -167,7 +167,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
         <div style="text-align:center"><div style="color:#fff;font-size:1.1rem;font-weight:600">Genergy — PV Fleet Dashboard</div><div style="color:#64748b;font-size:0.6rem" id="mapUpdated"></div></div>
     </div>
     <!-- Left panel: Station count + environmental -->
-    <div id="mapLeftPanel" style="position:absolute;top:10px;left:10px;z-index:520;width:220px">
+    <div id="mapLeftPanel" style="position:absolute;top:10px;left:10px;z-index:520;width:280px">
         <!-- Fleet summary mini -->
         <div style="background:rgba(20,28,38,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:8px;backdrop-filter:blur(8px)">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
@@ -213,7 +213,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
         </div>
     </div>
     <!-- Right panel: Alarms / problematic sites -->
-    <div id="mapRightPanel" style="position:absolute;top:10px;right:10px;z-index:520;width:240px">
+    <div id="mapRightPanel" style="position:absolute;top:10px;right:10px;z-index:520;width:300px">
         <div style="background:rgba(20,28,38,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;backdrop-filter:blur(8px);margin-bottom:8px">
             <div style="font-size:0.7rem;color:#9ca3af;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
                 <span>Alarms</span>
@@ -221,13 +221,13 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
             </div>
             <!-- Alarm ring -->
             <div style="text-align:center;margin-bottom:6px">
-                <svg width="80" height="80" viewBox="0 0 80 80" id="alarmRing">
-                    <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
-                    <circle cx="40" cy="40" r="32" fill="none" stroke="#ef4444" stroke-width="6" stroke-dasharray="0 201" stroke-linecap="round" transform="rotate(-90 40 40)" id="ringOffline"/>
-                    <circle cx="40" cy="40" r="32" fill="none" stroke="#fb923c" stroke-width="6" stroke-dasharray="0 201" stroke-linecap="round" transform="rotate(-90 40 40)" id="ringLow"/>
-                    <circle cx="40" cy="40" r="32" fill="none" stroke="#22c55e" stroke-width="6" stroke-dasharray="0 201" stroke-linecap="round" transform="rotate(-90 40 40)" id="ringOk"/>
-                    <text x="40" y="36" text-anchor="middle" fill="#fff" font-size="18" font-weight="700" id="alarmTotal">0</text>
-                    <text x="40" y="48" text-anchor="middle" fill="#9ca3af" font-size="7">Total Faults</text>
+                <svg width="110" height="110" viewBox="0 0 110 110" id="alarmRing">
+                    <circle cx="55" cy="55" r="42" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+                    <circle cx="55" cy="55" r="42" fill="none" stroke="#ef4444" stroke-width="8" stroke-dasharray="0 264" stroke-linecap="round" transform="rotate(-90 55 55)" id="ringOffline"/>
+                    <circle cx="55" cy="55" r="42" fill="none" stroke="#fb923c" stroke-width="8" stroke-dasharray="0 264" stroke-linecap="round" transform="rotate(-90 55 55)" id="ringLow"/>
+                    <circle cx="55" cy="55" r="42" fill="none" stroke="#22c55e" stroke-width="8" stroke-dasharray="0 264" stroke-linecap="round" transform="rotate(-90 55 55)" id="ringOk"/>
+                    <text x="55" y="50" text-anchor="middle" fill="#fff" font-size="24" font-weight="700" id="alarmTotal">0</text>
+                    <text x="55" y="66" text-anchor="middle" fill="#9ca3af" font-size="8">Total Faults</text>
                 </svg>
                 <div style="display:flex;justify-content:center;gap:12px;font-size:0.55rem">
                     <span style="color:#ef4444">● Offline <span id="alarmOffN">0</span></span>
@@ -237,7 +237,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
             </div>
         </div>
         <!-- Problem sites slideshow -->
-        <div id="alarmSlider" style="background:rgba(20,28,38,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:10px;backdrop-filter:blur(8px);max-height:300px;overflow:hidden">
+        <div id="alarmSlider" style="background:rgba(20,28,38,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:10px;backdrop-filter:blur(8px);max-height:400px;overflow:hidden">
             <div id="alarmCards" style="transition:transform 0.5s ease"></div>
         </div>
     </div>
@@ -255,6 +255,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
             <button onclick="toggleMapCardMode()" id="mapCardModeBtn" style="background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.4);color:#60a5fa;border-radius:5px;padding:3px 8px;cursor:pointer;font-size:0.6rem;font-weight:600">30-Day Avg</button>
             <button onclick="mapCardsScroll(-1)" style="background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.1);color:#9ca3af;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:0.8rem">◀</button>
             <button onclick="mapCardsScroll(1)" style="background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.1);color:#9ca3af;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:0.8rem">▶</button>
+            <button id="trainBtn" onclick="toggleTrain()" style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#22c55e;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:0.65rem;font-weight:600">▶ Auto</button>
         </div>
         <div id="mapCardsRow" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scroll-behavior:smooth"></div>
     </div>
@@ -322,6 +323,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
         </div>
     </div>
     <div class="legend-bar" id="legendBar"></div>
+    <div id="rotateHeading" style="text-align:center;margin-bottom:10px;display:none"><span style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);color:#a855f7;padding:6px 20px;border-radius:20px;font-size:0.8rem;font-weight:600" id="rotateLabel"></span></div>
     <div id="sitesContainer" class="sites-grid"><div class="loading">Loading site data...</div></div>
     <div class="footer-note">Auto-refreshes every 5 min · Scrapers run 05:00–21:00 SAST</div>
     <button class="refresh-btn" onclick="loadAllSites()">🔄 Refresh</button>
@@ -539,10 +541,65 @@ function getYesterday(site){const h=site.history||{},d=Object.keys(h).sort();if(
 
 // ── Groups ──────────────────────────────────────────────────
 let editingGroup='';
-function buildGroupMenu(){const groups=ldGrp(),menu=document.getElementById('groupMenu'),gn=Object.keys(groups);let html='<div class="dropdown-header">Select Group</div>';if(!gn.length)html+='<div class="dropdown-item" style="color:#6b7280;font-size:0.7rem">No groups yet</div>';else gn.forEach(g=>{html+=`<div class="dropdown-item" style="justify-content:space-between"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1"><input type="checkbox" value="${g}" onchange="applyFilters()"> ${g} (${groups[g].length})</label>${isAdmin()?`<span class="group-del" onclick="event.stopPropagation();deleteGroup('${g}')">✕</span>`:''}</div>`});if(isAdmin()){html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Create New Group</div><div class="group-row"><input id="newGrpName" placeholder="Group name..." onkeydown="if(event.key==='Enter')createGroup()"><button onclick="createGroup()">Create</button></div>`;if(gn.length){html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Edit Group</div><div class="group-row"><select id="editGrpSel" style="flex:1;background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#e2e8f0;padding:5px;font-size:0.72rem" onchange="editingGroup=this.value;buildGroupMenu()"><option value="">Choose group...</option>${gn.map(g=>`<option value="${g}" ${editingGroup===g?'selected':''}>${g}</option>`).join('')}</select></div>`;if(editingGroup&&groups[editingGroup]){html+='<div class="group-sites">';ALL_SITES.forEach(s=>{html+=`<label><input type="checkbox" ${groups[editingGroup].includes(s.name)?'checked':''} onchange="togSiteGrp('${s.name.replace(/'/g,"\\'")}',this.checked)"> ${s.name}</label>`});html+='</div>'}}}menu.innerHTML=html}
-function createGroup(){const inp=document.getElementById('newGrpName'),n=inp.value.trim();if(!n)return;const g=ldGrp();if(!g[n])g[n]=[];svGrp(g);inp.value='';editingGroup=n;buildGroupMenu()}
+function buildGroupMenu(){
+    const groups=ldGrp(),menu=document.getElementById('groupMenu'),gn=Object.keys(groups);
+    let html='<div class="dropdown-header">Filter by Group</div>';
+    if(!gn.length)html+='<div class="dropdown-item" style="color:#6b7280;font-size:0.7rem">No groups yet</div>';
+    else gn.forEach(g=>{html+=`<div class="dropdown-item" style="justify-content:space-between"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1"><input type="checkbox" value="${g}" onchange="applyFilters()"> ${g} (${groups[g].length})</label>${isAdmin()?`<span class="group-del" onclick="event.stopPropagation();deleteGroup('${g}')">✕</span>`:''}</div>`});
+    if(isAdmin()){
+        // Quick create from location
+        const locs=[...new Set(ALL_SITES.map(s=>s.location).filter(Boolean))].sort();
+        html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Quick Create from Location</div>`;
+        html+=`<div class="group-row"><select id="locGroupSel" style="flex:1;background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#e2e8f0;padding:5px;font-size:0.72rem"><option value="">Select location...</option>${locs.map(l=>`<option value="${l}">${l} (${ALL_SITES.filter(s=>s.location===l).length})</option>`).join('')}</select><button onclick="createLocGroup()">Create</button></div>`;
+        // Custom group
+        html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Create Custom Group</div>`;
+        html+=`<div class="group-row"><input id="newGrpName" placeholder="Group name..." onkeydown="if(event.key==='Enter')showGroupEditor()"><button onclick="showGroupEditor()">Next →</button></div>`;
+        // Edit existing group — easy multi-select
+        if(gn.length){
+            html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Edit Group</div>`;
+            html+=`<div class="group-row"><select id="editGrpSel" style="flex:1;background:rgba(15,20,25,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#e2e8f0;padding:5px;font-size:0.72rem" onchange="editingGroup=this.value;buildGroupMenu()"><option value="">Choose group...</option>${gn.map(g=>`<option value="${g}" ${editingGroup===g?'selected':''}>${g}</option>`).join('')}</select></div>`;
+            if(editingGroup&&groups[editingGroup]){
+                html+=`<div class="group-sites" style="max-height:250px">`;
+                // Show selected sites first, then unselected
+                const selected=ALL_SITES.filter(s=>groups[editingGroup].includes(s.name));
+                const unselected=ALL_SITES.filter(s=>!groups[editingGroup].includes(s.name));
+                if(selected.length)html+=`<div style="font-size:0.55rem;color:#22c55e;padding:4px 0;font-weight:600">✓ In group (${selected.length})</div>`;
+                selected.forEach(s=>{html+=`<label style="background:rgba(34,197,94,0.08);border-radius:4px;padding:4px 6px;margin-bottom:2px"><input type="checkbox" checked onchange="togSiteGrp('${s.name.replace(/'/g,"\\'")}',this.checked)"> ${s.name} <span style="color:#4b5563;font-size:0.55rem">${s.location||''}</span></label>`});
+                if(unselected.length)html+=`<div style="font-size:0.55rem;color:#6b7280;padding:4px 0;font-weight:600;margin-top:4px">Available (${unselected.length})</div>`;
+                unselected.forEach(s=>{html+=`<label><input type="checkbox" onchange="togSiteGrp('${s.name.replace(/'/g,"\\'")}',this.checked)"> ${s.name} <span style="color:#4b5563;font-size:0.55rem">${s.location||''}</span></label>`});
+                html+=`</div>`;
+            }
+        }
+        // Export/Import
+        html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Sync Settings</div>`;
+        html+=`<div class="group-row"><button onclick="exportSettings()" style="flex:1;font-size:0.6rem">📋 Copy Settings</button><button onclick="importSettings()" style="flex:1;font-size:0.6rem">📥 Paste Settings</button></div>`;
+        html+=`<div style="padding:2px 14px;font-size:0.5rem;color:#4b5563">Copy settings to sync between devices</div>`;
+    }
+    menu.innerHTML=html;
+}
+function showGroupEditor(){
+    const inp=document.getElementById('newGrpName');const n=inp.value.trim();
+    if(!n){inp.focus();return}
+    const g=ldGrp();if(!g[n])g[n]=[];svGrp(g);inp.value='';editingGroup=n;buildGroupMenu();
+}
+function createLocGroup(){
+    const sel=document.getElementById('locGroupSel');const loc=sel.value;if(!loc)return;
+    const g=ldGrp();const sites=ALL_SITES.filter(s=>s.location===loc).map(s=>s.name);
+    g[loc]=sites;svGrp(g);buildGroupMenu();
+}
+function createGroup(){showGroupEditor()}
 function deleteGroup(n){const g=ldGrp();delete g[n];svGrp(g);if(editingGroup===n)editingGroup='';buildGroupMenu();applyFilters()}
 function togSiteGrp(name,checked){const g=ldGrp();if(!editingGroup||!g[editingGroup])return;if(checked&&!g[editingGroup].includes(name))g[editingGroup].push(name);if(!checked)g[editingGroup]=g[editingGroup].filter(n=>n!==name);svGrp(g);buildGroupMenu()}
+// Export/Import settings for cross-device sync
+function exportSettings(){
+    const data={groups:ldGrp(),user:currentUser?.username||'anon'};
+    navigator.clipboard.writeText(JSON.stringify(data)).then(()=>alert('Settings copied to clipboard! Paste them on your other device.')).catch(()=>{prompt('Copy this text:',JSON.stringify(data))});
+}
+function importSettings(){
+    const txt=prompt('Paste settings from other device:');if(!txt)return;
+    try{const data=JSON.parse(txt);if(data.groups){svGrp(data.groups);buildGroupMenu();applyFilters();alert(`Imported ${Object.keys(data.groups).length} groups!`)}else{alert('Invalid settings data')}}
+    catch(e){alert('Could not parse settings. Make sure you copied the full text.')}
+}
 
 // ── Load ────────────────────────────────────────────────────
 (async()=>{if(await checkLogin())loadAllSites()})();
@@ -587,14 +644,13 @@ function goToToday(){document.getElementById('datePicker').value=todaySAST();vie
 
 // ── Auto-rotate ─────────────────────────────────────────────
 function toggleRotate(){
-    if(rotateInterval){clearInterval(rotateInterval);rotateInterval=null;document.getElementById('rotateBtn').classList.remove('rotate-active');document.getElementById('rotateBtn').textContent='▶ Rotate';clearAllFilters();return}
+    if(rotateInterval){clearInterval(rotateInterval);rotateInterval=null;document.getElementById('rotateBtn').classList.remove('rotate-active');document.getElementById('rotateBtn').textContent='▶ Rotate';document.getElementById('rotateHeading').style.display='none';clearAllFilters();return}
     const rotateType=document.getElementById('rotateType').value;
     if(rotateType==='client'){
         const groups=ldGrp(),gn=Object.keys(groups);
         if(!gn.length){alert('Create client groups first');return}
         rotateGroups=gn;
     } else {
-        // Rotate by location — get unique locations from loaded sites
         const locs=[...new Set(allSitesData.map(s=>s.location).filter(Boolean))].sort();
         if(!locs.length){alert('No location data');return}
         rotateGroups=locs;
@@ -602,6 +658,7 @@ function toggleRotate(){
     rotateIdx=0;
     document.getElementById('rotateBtn').classList.add('rotate-active');
     document.getElementById('rotateBtn').textContent='⏸ Rotate';
+    document.getElementById('rotateHeading').style.display='block';
     doRotateStep();
     rotateInterval=setInterval(doRotateStep,15000);
 }
@@ -610,31 +667,27 @@ function doRotateStep(){
     const rotateType=document.getElementById('rotateType').value;
     const gName=rotateGroups[rotateIdx%rotateGroups.length];
     rotateIdx++;
+    // Show heading
+    const typeLabel=rotateType==='client'?'Client Group':'Location';
+    document.getElementById('rotateLabel').textContent=`${typeLabel}: ${gName}`;
     const grid=document.getElementById('sitesContainer');
     grid.classList.add('fading');
     setTimeout(()=>{
         if(rotateType==='client'){
-            // Check the matching client group checkbox
             document.querySelectorAll('#groupMenu input[type=checkbox]').forEach(c=>c.checked=false);
             buildGroupMenu();
             setTimeout(()=>{
                 document.querySelectorAll('#groupMenu input[type=checkbox]').forEach(c=>{if(c.value===gName)c.checked=true});
-                applyFilters();
-                grid.classList.remove('fading');
-                window.scrollTo({top:0,behavior:'smooth'});
+                applyFilters();grid.classList.remove('fading');window.scrollTo({top:0,behavior:'smooth'});
             },50);
         } else {
-            // Location mode — filter by location name directly
             clearAllFilters();
-            // Override siteVisible temporarily
-            const locFilter=gName;
             allSitesData.forEach(s=>{
                 const cid=`c-${s.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`;
                 const card=document.querySelector(`[id="${CSS.escape(cid)}"]`)?.closest('.site-card');
-                if(card){card.classList.toggle('hidden',s.location!==locFilter)}
+                if(card)card.classList.toggle('hidden',s.location!==gName);
             });
-            grid.classList.remove('fading');
-            window.scrollTo({top:0,behavior:'smooth'});
+            grid.classList.remove('fading');window.scrollTo({top:0,behavior:'smooth'});
         }
     },300);
 }
@@ -739,9 +792,15 @@ function openMap(){
         updateMapPanels();
         renderMapCards();
         startAlarmSlideshow();
+        startMapRefresh();
     },100);
 }
-function closeMap(){document.getElementById('mapOverlay').classList.remove('show');if(alarmSlideTimer){clearInterval(alarmSlideTimer);alarmSlideTimer=null}}
+function closeMap(){
+    document.getElementById('mapOverlay').classList.remove('show');
+    if(alarmSlideTimer){clearInterval(alarmSlideTimer);alarmSlideTimer=null}
+    if(trainTimer){clearInterval(trainTimer);trainTimer=null;document.getElementById('trainBtn').textContent='▶ Auto';document.getElementById('trainBtn').style.color='#22c55e'}
+    if(mapRefreshTimer){clearInterval(mapRefreshTimer);mapRefreshTimer=null}
+}
 
 function updateMapPanels(){
     const scope=allSitesData,fresh=scope.filter(s=>!isStale(s));
@@ -764,8 +823,8 @@ function updateMapPanels(){
     document.getElementById('envCoal').textContent=fmt(tot*0.4/1000,1)+' Tons';
     document.getElementById('envTrees').textContent=fmtI(tot*0.9/22*365/1000)+' kTrees';
     document.getElementById('envCo2').textContent=fmt(tot*0.9/1000,1)+' Tons';
-    // Alarm ring
-    const total=ok+lo+off,circ=2*Math.PI*32;
+    // Alarm ring (radius 42)
+    const total=ok+lo+off,circ=2*Math.PI*42;
     const okA=(ok/Math.max(total,1))*circ,loA=(lo/Math.max(total,1))*circ,offA=(off/Math.max(total,1))*circ;
     document.getElementById('ringOk').setAttribute('stroke-dasharray',`${okA} ${circ}`);
     document.getElementById('ringLow').setAttribute('stroke-dasharray',`${loA} ${circ}`);document.getElementById('ringLow').setAttribute('stroke-dashoffset',`${-okA}`);
@@ -854,6 +913,29 @@ function renderMapCards(){
     },100);
 }
 function mapCardsScroll(dir){document.getElementById('mapCardsRow').scrollBy({left:dir*340,behavior:'smooth'})}
+// Train auto-scroll
+let trainTimer=null;
+function toggleTrain(){
+    const btn=document.getElementById('trainBtn');
+    if(trainTimer){clearInterval(trainTimer);trainTimer=null;btn.textContent='▶ Auto';btn.style.color='#22c55e';return}
+    btn.textContent='⏸ Auto';btn.style.color='#a855f7';
+    trainTimer=setInterval(()=>{
+        const row=document.getElementById('mapCardsRow');
+        // If near the end, loop back to start
+        if(row.scrollLeft+row.clientWidth>=row.scrollWidth-50){row.scrollTo({left:0,behavior:'smooth'})}
+        else{row.scrollBy({left:320,behavior:'smooth'})}
+    },4000);
+}
+// Map auto-refresh every 5 min
+let mapRefreshTimer=null;
+function startMapRefresh(){
+    if(mapRefreshTimer)clearInterval(mapRefreshTimer);
+    mapRefreshTimer=setInterval(async()=>{
+        if(!document.getElementById('mapOverlay').classList.contains('show'))return;
+        await loadAllSites(true);
+        buildMapMarkers();updateMapPanels();renderMapCards();
+    },300000);
+}
 </script>
 </body>
 </html>
