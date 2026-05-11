@@ -378,11 +378,9 @@ async function doLogin(){
     document.getElementById('loginOverlay').style.display='none';
     errEl.textContent='';
     renderUserBar();
-    // Decrypt sync token if admin (password is in memory, used only now, then discarded)
-    if(userData.role==='admin'){
-        syncToken=await decryptSyncToken(p);
-        if(syncToken)console.log('Sync token decrypted successfully');
-    }
+    // Decrypt sync token for this user (all users can sync)
+    syncToken=await decryptSyncToken(p);
+    if(syncToken)console.log('Sync token decrypted successfully');
     await loadSettings();
     loadAllSites();
 }
@@ -429,22 +427,23 @@ let settingsSHA=null;
 let syncToken=null;  // Decrypted in memory only — never stored
 const SETTINGS_PATH='data/user_settings.json';
 const REPO_OWNER='GenergyDashboard';
-const REPO_NAME='Genergy-PV-Alert-Dashboard';  // 
+const REPO_NAME='Genergy-PV-Alert-Dashboard';
 
-// Decrypt sync token from auth.json using admin password
+// Decrypt sync token for the current user using their password
 async function decryptSyncToken(password){
-    const enc=AUTH_DATA?._sync_token_encrypted;
+    const u=currentUser?.username;
+    const tokens=AUTH_DATA?._sync_tokens;
+    const enc=tokens&&tokens[u];
     if(!enc||!enc.salt||!enc.nonce||!enc.ciphertext)return null;
     try{
         const salt=Uint8Array.from(atob(enc.salt),c=>c.charCodeAt(0));
         const nonce=Uint8Array.from(atob(enc.nonce),c=>c.charCodeAt(0));
         const ciphertext=Uint8Array.from(atob(enc.ciphertext),c=>c.charCodeAt(0));
-        // Derive key with PBKDF2 (same params as Python script)
         const keyMaterial=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveKey']);
         const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:100000,hash:'SHA-256'},keyMaterial,{name:'AES-GCM',length:256},false,['decrypt']);
         const decrypted=await crypto.subtle.decrypt({name:'AES-GCM',iv:nonce},key,ciphertext);
         return new TextDecoder().decode(decrypted);
-    }catch(e){console.warn('Token decryption failed (wrong password or corrupt data)');return null}
+    }catch(e){console.warn('Token decryption failed for',u);return null}
 }
 
 async function loadSettings(){
@@ -650,9 +649,9 @@ function buildGroupMenu(){
         }
         // Sync status
         html+=`<div class="dropdown-divider"></div>`;
-        const hasEnc=AUTH_DATA&&AUTH_DATA._sync_token_encrypted;
+        const hasEnc=AUTH_DATA&&AUTH_DATA._sync_tokens&&AUTH_DATA._sync_tokens[currentUser?.username];
         const syncActive=!!syncToken;
-        html+=`<div style="padding:4px 14px;font-size:0.5rem;color:${syncActive?'#22c55e':hasEnc?'#eab308':'#fb923c'}">${syncActive?'✅ Settings sync across all devices automatically':hasEnc?'🔑 Sync available (admin login decrypts token)':'⚠️ Run encrypt_token.py to enable cross-device sync'}</div>`;
+        html+=`<div style="padding:4px 14px;font-size:0.5rem;color:${syncActive?'#22c55e':hasEnc?'#22c55e':'#fb923c'}">${syncActive?'✅ Settings sync active — changes save to all devices':hasEnc?'✅ Sync enabled — sign out & back in to activate write sync':'⚠️ No sync token found for this user'}</div>`;
     }
     menu.innerHTML=html;
 }
