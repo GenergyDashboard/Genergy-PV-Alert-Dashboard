@@ -378,6 +378,12 @@ async function doLogin(){
     document.getElementById('loginOverlay').style.display='none';
     errEl.textContent='';
     renderUserBar();
+    // Decrypt sync token if admin (password is in memory, used only now, then discarded)
+    if(userData.role==='admin'){
+        syncToken=await decryptSyncToken(p);
+        if(syncToken)console.log('Sync token decrypted successfully');
+    }
+    await loadSettings();
     loadAllSites();
 }
 
@@ -400,6 +406,7 @@ async function checkLogin(){
                 currentUser={username:session.username,role:userData.role,display:userData.display};
                 document.getElementById('loginOverlay').style.display='none';
                 renderUserBar();
+                await loadSettings();
                 return true;
             }
         }
@@ -415,10 +422,81 @@ function renderUserBar(){
 }
 function isAdmin(){return currentUser&&currentUser.role==='admin'}
 
-// ── Per-user settings (stored in localStorage under username key) ──
-function userKey(key){return currentUser?`g_${currentUser.username}_${key}`:`g_anon_${key}`}
-function ldGrp(){try{return JSON.parse(localStorage.getItem(userKey('groups')))||{}}catch(e){return{}}}
-function svGrp(g){localStorage.setItem(userKey('groups'),JSON.stringify(g))}
+// ── Per-user settings (synced via GitHub API) ──────────────
+let userSettings={};
+let settingsLoaded=false;
+let settingsSHA=null;
+let syncToken=null;  // Decrypted in memory only — never stored
+const SETTINGS_PATH='data/user_settings.json';
+const REPO_OWNER='GenergyDashboard';
+const REPO_NAME='genergy-overview';  // ← change to your overview repo name
+
+// Decrypt sync token from auth.json using admin password
+async function decryptSyncToken(password){
+    const enc=AUTH_DATA?._sync_token_encrypted;
+    if(!enc||!enc.salt||!enc.nonce||!enc.ciphertext)return null;
+    try{
+        const salt=Uint8Array.from(atob(enc.salt),c=>c.charCodeAt(0));
+        const nonce=Uint8Array.from(atob(enc.nonce),c=>c.charCodeAt(0));
+        const ciphertext=Uint8Array.from(atob(enc.ciphertext),c=>c.charCodeAt(0));
+        // Derive key with PBKDF2 (same params as Python script)
+        const keyMaterial=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveKey']);
+        const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:100000,hash:'SHA-256'},keyMaterial,{name:'AES-GCM',length:256},false,['decrypt']);
+        const decrypted=await crypto.subtle.decrypt({name:'AES-GCM',iv:nonce},key,ciphertext);
+        return new TextDecoder().decode(decrypted);
+    }catch(e){console.warn('Token decryption failed (wrong password or corrupt data)');return null}
+}
+
+async function loadSettings(){
+    try{
+        if(syncToken){
+            const r=await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${SETTINGS_PATH}`,{
+                headers:{'Authorization':`token ${syncToken}`,'Accept':'application/vnd.github.v3+json'}
+            });
+            if(r.ok){
+                const data=await r.json();
+                settingsSHA=data.sha;
+                userSettings=JSON.parse(atob(data.content));
+                settingsLoaded=true;
+                console.log('Settings loaded from GitHub');
+                return;
+            }
+        }
+    }catch(e){console.warn('GitHub settings fetch failed:',e)}
+    try{
+        const r=await fetch(`./${SETTINGS_PATH}?t=${Date.now()}`);
+        if(r.ok){userSettings=await r.json();settingsLoaded=true;console.log('Settings loaded from Pages cache')}
+    }catch(e){}
+    try{const s=localStorage.getItem('g_settings');if(s){userSettings=JSON.parse(s);settingsLoaded=true}}catch(e){}
+}
+
+async function saveSettings(){
+    localStorage.setItem('g_settings',JSON.stringify(userSettings));
+    if(!syncToken)return;
+    try{
+        const content=btoa(unescape(encodeURIComponent(JSON.stringify(userSettings,null,2))));
+        const body={message:`Update user settings - ${new Date().toISOString().slice(0,16)}`,content};
+        if(settingsSHA)body.sha=settingsSHA;
+        const r=await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${SETTINGS_PATH}`,{
+            method:'PUT',
+            headers:{'Authorization':`token ${syncToken}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+            body:JSON.stringify(body)
+        });
+        if(r.ok){const data=await r.json();settingsSHA=data.content.sha;console.log('Settings saved to GitHub')}
+        else{console.warn('GitHub save failed:',r.status)}
+    }catch(e){console.warn('GitHub settings save failed:',e)}
+}
+
+function ldGrp(){
+    const u=currentUser?.username||'anon';
+    return(userSettings[u]&&userSettings[u].groups)||{};
+}
+function svGrp(g){
+    const u=currentUser?.username||'anon';
+    if(!userSettings[u])userSettings[u]={};
+    userSettings[u].groups=g;
+    saveSettings();
+}
 
 // ── Site definitions ────────────────────────────────────────
 const BASE="https://genergydashboard.github.io";
@@ -570,10 +648,11 @@ function buildGroupMenu(){
                 html+=`</div>`;
             }
         }
-        // Export/Import
-        html+=`<div class="dropdown-divider"></div><div class="dropdown-header">Sync Settings</div>`;
-        html+=`<div class="group-row"><button onclick="exportSettings()" style="flex:1;font-size:0.6rem">📋 Copy Settings</button><button onclick="importSettings()" style="flex:1;font-size:0.6rem">📥 Paste Settings</button></div>`;
-        html+=`<div style="padding:2px 14px;font-size:0.5rem;color:#4b5563">Copy settings to sync between devices</div>`;
+        // Sync status
+        html+=`<div class="dropdown-divider"></div>`;
+        const hasEnc=AUTH_DATA&&AUTH_DATA._sync_token_encrypted;
+        const syncActive=!!syncToken;
+        html+=`<div style="padding:4px 14px;font-size:0.5rem;color:${syncActive?'#22c55e':hasEnc?'#eab308':'#fb923c'}">${syncActive?'✅ Settings sync across all devices automatically':hasEnc?'🔑 Sync available (admin login decrypts token)':'⚠️ Run encrypt_token.py to enable cross-device sync'}</div>`;
     }
     menu.innerHTML=html;
 }
@@ -590,16 +669,7 @@ function createLocGroup(){
 function createGroup(){showGroupEditor()}
 function deleteGroup(n){const g=ldGrp();delete g[n];svGrp(g);if(editingGroup===n)editingGroup='';buildGroupMenu();applyFilters()}
 function togSiteGrp(name,checked){const g=ldGrp();if(!editingGroup||!g[editingGroup])return;if(checked&&!g[editingGroup].includes(name))g[editingGroup].push(name);if(!checked)g[editingGroup]=g[editingGroup].filter(n=>n!==name);svGrp(g);buildGroupMenu()}
-// Export/Import settings for cross-device sync
-function exportSettings(){
-    const data={groups:ldGrp(),user:currentUser?.username||'anon'};
-    navigator.clipboard.writeText(JSON.stringify(data)).then(()=>alert('Settings copied to clipboard! Paste them on your other device.')).catch(()=>{prompt('Copy this text:',JSON.stringify(data))});
-}
-function importSettings(){
-    const txt=prompt('Paste settings from other device:');if(!txt)return;
-    try{const data=JSON.parse(txt);if(data.groups){svGrp(data.groups);buildGroupMenu();applyFilters();alert(`Imported ${Object.keys(data.groups).length} groups!`)}else{alert('Invalid settings data')}}
-    catch(e){alert('Could not parse settings. Make sure you copied the full text.')}
-}
+// Settings sync is automatic via GitHub API
 
 // ── Load ────────────────────────────────────────────────────
 (async()=>{if(await checkLogin())loadAllSites()})();
