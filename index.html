@@ -152,7 +152,10 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
         <h2>Genergy PV Dashboard</h2>
         <div class="sub">Sign in to access fleet monitoring</div>
         <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
-        <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+        <div style="position:relative">
+            <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+            <button type="button" onclick="togglePassVis()" id="passToggle" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#6b7280;cursor:pointer;font-size:0.8rem;padding:4px" title="Show password">👁</button>
+        </div>
         <button onclick="doLogin()">Sign In</button>
         <div class="login-err" id="loginErr"></div>
     </div>
@@ -342,6 +345,12 @@ async function sha256(message){
     const hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);
     return Array.from(new Uint8Array(hashBuffer)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
+function togglePassVis(){
+    const inp=document.getElementById('loginPass');
+    const btn=document.getElementById('passToggle');
+    if(inp.type==='password'){inp.type='text';btn.textContent='🔒';btn.title='Hide password'}
+    else{inp.type='password';btn.textContent='👁';btn.title='Show password'}
+}
 
 async function loadAuthData(){
     try{
@@ -472,29 +481,44 @@ async function loadSettings(){
 async function saveSettings(){
     localStorage.setItem('g_settings',JSON.stringify(userSettings));
     if(!syncToken)return;
-    try{
-        const content=btoa(unescape(encodeURIComponent(JSON.stringify(userSettings,null,2))));
-        const body={message:`Update user settings - ${new Date().toISOString().slice(0,16)}`,content};
-        if(settingsSHA)body.sha=settingsSHA;
-        const r=await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${SETTINGS_PATH}`,{
-            method:'PUT',
-            headers:{'Authorization':`token ${syncToken}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
-            body:JSON.stringify(body)
-        });
-        if(r.ok){const data=await r.json();settingsSHA=data.content.sha;console.log('Settings saved to GitHub')}
-        else{console.warn('GitHub save failed:',r.status)}
-    }catch(e){console.warn('GitHub settings save failed:',e)}
+    for(let attempt=0;attempt<3;attempt++){
+        try{
+            const content=btoa(unescape(encodeURIComponent(JSON.stringify(userSettings,null,2))));
+            const body={message:`Update user settings - ${new Date().toISOString().slice(0,16)}`,content};
+            if(settingsSHA)body.sha=settingsSHA;
+            const r=await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${SETTINGS_PATH}`,{
+                method:'PUT',
+                headers:{'Authorization':`token ${syncToken}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+                body:JSON.stringify(body)
+            });
+            if(r.ok){const data=await r.json();settingsSHA=data.content.sha;console.log('Settings saved to GitHub');return}
+            if(r.status===409){
+                // SHA conflict — re-fetch current SHA and retry
+                console.warn('SHA conflict — re-fetching and retrying...');
+                const fr=await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${SETTINGS_PATH}`,{
+                    headers:{'Authorization':`token ${syncToken}`,'Accept':'application/vnd.github.v3+json'}
+                });
+                if(fr.ok){const fd=await fr.json();settingsSHA=fd.sha}
+                continue;
+            }
+            console.warn('GitHub save failed:',r.status);return;
+        }catch(e){console.warn('GitHub settings save failed:',e);return}
+    }
 }
 
 function ldGrp(){
     const u=currentUser?.username||'anon';
     return(userSettings[u]&&userSettings[u].groups)||{};
 }
+let saveDebounce=null;
 function svGrp(g){
     const u=currentUser?.username||'anon';
     if(!userSettings[u])userSettings[u]={};
     userSettings[u].groups=g;
-    saveSettings();
+    // Debounce: wait 500ms after last change before saving to GitHub
+    localStorage.setItem('g_settings',JSON.stringify(userSettings));
+    if(saveDebounce)clearTimeout(saveDebounce);
+    saveDebounce=setTimeout(()=>saveSettings(),500);
 }
 
 // ── Site definitions ────────────────────────────────────────
