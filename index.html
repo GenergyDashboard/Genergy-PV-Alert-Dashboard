@@ -658,16 +658,39 @@ function buildGroupMenu(){
 function showGroupEditor(){
     const inp=document.getElementById('newGrpName');const n=inp.value.trim();
     if(!n){inp.focus();return}
-    const g=ldGrp();if(!g[n])g[n]=[];svGrp(g);inp.value='';editingGroup=n;buildGroupMenu();
+    const g=ldGrp();if(!g[n])g[n]=[];svGrp(g);inp.value='';editingGroup=n;
+    buildGroupMenu();
+    // Keep dropdown open
+    document.getElementById('groupMenu').classList.add('show');
 }
 function createLocGroup(){
     const sel=document.getElementById('locGroupSel');const loc=sel.value;if(!loc)return;
     const g=ldGrp();const sites=ALL_SITES.filter(s=>s.location===loc).map(s=>s.name);
-    g[loc]=sites;svGrp(g);buildGroupMenu();
+    g[loc]=sites;svGrp(g);
+    buildGroupMenu();
+    document.getElementById('groupMenu').classList.add('show');
 }
 function createGroup(){showGroupEditor()}
-function deleteGroup(n){const g=ldGrp();delete g[n];svGrp(g);if(editingGroup===n)editingGroup='';buildGroupMenu();applyFilters()}
-function togSiteGrp(name,checked){const g=ldGrp();if(!editingGroup||!g[editingGroup])return;if(checked&&!g[editingGroup].includes(name))g[editingGroup].push(name);if(!checked)g[editingGroup]=g[editingGroup].filter(n=>n!==name);svGrp(g);buildGroupMenu()}
+function deleteGroup(n){const g=ldGrp();delete g[n];svGrp(g);if(editingGroup===n)editingGroup='';buildGroupMenu();document.getElementById('groupMenu').classList.add('show');applyFilters()}
+function togSiteGrp(name,checked){
+    const g=ldGrp();if(!editingGroup||!g[editingGroup])return;
+    if(checked&&!g[editingGroup].includes(name))g[editingGroup].push(name);
+    if(!checked)g[editingGroup]=g[editingGroup].filter(n=>n!==name);
+    svGrp(g);
+    // Rebuild just the site list, not the whole menu — preserves scroll
+    const sitesDiv=document.querySelector('#groupMenu .group-sites');
+    if(!sitesDiv)return;
+    const scrollTop=sitesDiv.scrollTop;
+    const selected=ALL_SITES.filter(s=>g[editingGroup].includes(s.name));
+    const unselected=ALL_SITES.filter(s=>!g[editingGroup].includes(s.name));
+    let html='';
+    if(selected.length)html+=`<div style="font-size:0.55rem;color:#22c55e;padding:4px 0;font-weight:600">✓ In group (${selected.length})</div>`;
+    selected.forEach(s=>{html+=`<label style="background:rgba(34,197,94,0.08);border-radius:4px;padding:4px 6px;margin-bottom:2px"><input type="checkbox" checked onchange="togSiteGrp('${s.name.replace(/'/g,"\\'")}',this.checked)"> ${s.name} <span style="color:#4b5563;font-size:0.55rem">${s.location||''}</span></label>`});
+    if(unselected.length)html+=`<div style="font-size:0.55rem;color:#6b7280;padding:4px 0;font-weight:600;margin-top:4px">Available (${unselected.length})</div>`;
+    unselected.forEach(s=>{html+=`<label><input type="checkbox" onchange="togSiteGrp('${s.name.replace(/'/g,"\\'")}',this.checked)"> ${s.name} <span style="color:#4b5563;font-size:0.55rem">${s.location||''}</span></label>`});
+    sitesDiv.innerHTML=html;
+    sitesDiv.scrollTop=scrollTop;
+}
 // Settings sync is automatic via GitHub API
 
 // ── Load ────────────────────────────────────────────────────
