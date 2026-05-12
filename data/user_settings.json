@@ -1,7 +1,9 @@
 {
   "admin": {
     "groups": {
-      "WG": []
+      "WG": [
+        "WG Circular Business Park"
+      ]
     }
   },
   "kevin": {
