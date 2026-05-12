@@ -27,12 +27,7 @@
     }
   },
   "kevin": {
-    "groups": {
-      "Test": [
-        "Addo Spar",
-        "Bel Essex (Valeo)"
-      ]
-    }
+    "groups": {}
   },
   "david": {
     "groups": {}
