@@ -455,7 +455,7 @@ async function loadSettings(){
             if(r.ok){
                 const data=await r.json();
                 settingsSHA=data.sha;
-                userSettings=JSON.parse(atob(data.content));
+                userSettings=JSON.parse(atob(data.content.replace(/\s/g,'')));
                 settingsLoaded=true;
                 console.log('Settings loaded from GitHub');
                 return;
