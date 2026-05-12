@@ -35,8 +35,6 @@
     }
   },
   "david": {
-    "groups": {
-      "GQ": []
-    }
+    "groups": {}
   }
 }
