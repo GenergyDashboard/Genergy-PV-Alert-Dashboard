@@ -655,23 +655,25 @@ function buildGroupMenu(){
     }
     menu.innerHTML=html;
 }
+function keepGroupOpen(){
+    setTimeout(()=>{document.getElementById('groupMenu').classList.add('show')},10);
+}
 function showGroupEditor(){
     const inp=document.getElementById('newGrpName');const n=inp.value.trim();
     if(!n){inp.focus();return}
     const g=ldGrp();if(!g[n])g[n]=[];svGrp(g);inp.value='';editingGroup=n;
     buildGroupMenu();
-    // Keep dropdown open
-    document.getElementById('groupMenu').classList.add('show');
+    keepGroupOpen();
 }
 function createLocGroup(){
     const sel=document.getElementById('locGroupSel');const loc=sel.value;if(!loc)return;
     const g=ldGrp();const sites=ALL_SITES.filter(s=>s.location===loc).map(s=>s.name);
     g[loc]=sites;svGrp(g);
     buildGroupMenu();
-    document.getElementById('groupMenu').classList.add('show');
+    keepGroupOpen();
 }
 function createGroup(){showGroupEditor()}
-function deleteGroup(n){const g=ldGrp();delete g[n];svGrp(g);if(editingGroup===n)editingGroup='';buildGroupMenu();document.getElementById('groupMenu').classList.add('show');applyFilters()}
+function deleteGroup(n){const g=ldGrp();delete g[n];svGrp(g);if(editingGroup===n)editingGroup='';buildGroupMenu();keepGroupOpen();applyFilters()}
 function togSiteGrp(name,checked){
     const g=ldGrp();if(!editingGroup||!g[editingGroup])return;
     if(checked&&!g[editingGroup].includes(name))g[editingGroup].push(name);
