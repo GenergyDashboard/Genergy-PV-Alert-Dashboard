@@ -1,6 +1,8 @@
 {
   "admin": {
-    "groups": {}
+    "groups": {
+      "WG": []
+    }
   },
   "kevin": {
     "groups": {
