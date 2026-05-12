@@ -27,7 +27,9 @@
     }
   },
   "kevin": {
-    "groups": {}
+    "groups": {
+      "Test": []
+    }
   },
   "david": {
     "groups": {}
