@@ -104,6 +104,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 .sp.fusionsolar{background:rgba(234,88,12,.25);color:#fb923c}
 .sp.goodwe{background:rgba(34,197,94,.25);color:#22c55e}
 .sp.sunsynk{background:rgba(96,165,250,.25);color:#60a5fa}
+.sp.vrm{background:rgba(168,85,247,.25);color:#a855f7}
 .skwh{font-size:0.9rem;font-weight:700;color:#fff;white-space:nowrap}
 .skwh i{font-size:0.65rem;color:#9ca3af;font-style:normal}
 .sl{font-size:0.65rem;font-weight:700;white-space:nowrap}
@@ -298,6 +299,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
                 <label class="dropdown-item"><input type="checkbox" value="fusionsolar" onchange="applyFilters()" checked> FusionSolar</label>
                 <label class="dropdown-item"><input type="checkbox" value="goodwe" onchange="applyFilters()" checked> GoodWe</label>
                 <label class="dropdown-item"><input type="checkbox" value="sunsynk" onchange="applyFilters()" checked> Sunsynk</label>
+                <label class="dropdown-item"><input type="checkbox" value="vrm" onchange="applyFilters()" checked> VRM (Victron)</label>
             </div>
         </div>
         <div class="dropdown" id="groupDrop">
@@ -338,7 +340,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
 </div>
 <script>
 // ── MAINTENANCE MODE — set to true/false ─────────────────────
-const MAINTENANCE = false;
+const MAINTENANCE = true;
 if(MAINTENANCE){
     document.addEventListener('DOMContentLoaded',()=>{
         document.body.innerHTML=`
@@ -544,6 +546,9 @@ function svGrp(g){
 
 // ── Site definitions ────────────────────────────────────────
 const BASE="https://genergydashboard.github.io";
+const API_BASE=`${BASE}/Fleet-Monitoring-Platform`;
+const API_INDEX_URL=`${API_BASE}/sites_index.json`;
+
 const ALL_SITES=[
 {name:"Addo Spar",platform:"fusionsolar",location:"Addo",province:"Eastern Cape",lat:-33.47,lon:25.75,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/addo-spar/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/addo-spar/`},
 {name:"Bel Essex (Valeo)",platform:"fusionsolar",location:"Gqeberha",province:"Eastern Cape",lat:-33.78,lon:25.42,dataUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bel-essex-valeo/data/processed.json`,dashboardUrl:`${BASE}/Genergy-PV-Alert-Dashboard---Fusion-Solar-Sites/sites/bel-essex-valeo/`},
@@ -578,6 +583,94 @@ const ALL_SITES=[
     historyUrl:`${BASE}/1stAveSpar/data/history.json`,
     dashboardUrl:`${BASE}/1stAveSpar/`},
 ];
+
+// ── Dynamic API sites (VRM + Sunsynk from Fleet Monitoring Platform) ────
+async function loadAPISites(){
+    try{
+        const r=await fetch(`${API_INDEX_URL}?t=${Date.now()}`);
+        if(!r.ok)return[];
+        const idx=await r.json();
+        const apiSites=[];
+        for(const s of (idx.sites||[])){
+            if(s.hidden)continue;
+            if(s.platform!=='vrm'&&s.platform!=='sunsynk')continue;
+            const loc=s.location||{};
+            apiSites.push({
+                name:s.name,
+                platform:s.platform,
+                format:'api',
+                location:loc.town||'Unknown',
+                province:'',
+                lat:loc.lat||0,
+                lon:loc.lon||0,
+                dataUrl:`${API_BASE}/${s.data_path}`,
+                historyUrl:s.history_path?`${API_BASE}/${s.history_path}`:null,
+                hourlyHistUrl:s.hourly_history_path?`${API_BASE}/${s.hourly_history_path}`:null,
+                dashboardUrl:`${API_BASE}/site.html?id=${s.site_id}`,
+                siteId:s.site_id,
+            });
+        }
+        console.log(`Loaded ${apiSites.length} VRM/Sunsynk sites from API`);
+        return apiSites;
+    }catch(e){console.warn('Failed to load API sites:',e);return[]}
+}
+
+// Normalize API data.json into the format the overview dashboard expects
+function normalizeAPI(raw,site){
+    const cur=raw.current||{};
+    const energy=raw.energy||{};
+    const hourlyRaw=raw.energy_powerflow_hourly||[];
+    const perf=raw.performance||{};
+
+    // Build hourly PV array (0-23)
+    const pv=new Array(24).fill(0);
+    hourlyRaw.forEach(h=>{
+        const t=h.time||'';
+        const hour=parseInt(t.split(' ')[1]?.split(':')[0]||'-1');
+        if(hour>=0&&hour<24){
+            // Total PV = to_load + to_batt + to_grid + solar_yield (different platforms use different fields)
+            const pvTotal=(h.pv_to_load||0)+(h.pv_to_batt||0)+(h.pv_to_grid||0);
+            const solarYield=h.solar_yield_kwh||h.pvPower||0;
+            pv[hour]=Math.round((pvTotal||solarYield)*100)/100;
+        }
+    });
+
+    const totalKwh=Math.round((cur.today_kwh||energy.today?.pv||pv.reduce((a,b)=>a+b,0))*100)/100;
+    let lastHour=0;for(let i=23;i>=0;i--)if(pv[i]>0){lastHour=i;break}
+
+    // Map status
+    const severity=cur.status_severity||'';
+    const status=severity==='ok'?'ok':severity==='warning'?'low':(totalKwh>0?'ok':'offline');
+
+    // Date from updated_at
+    const date=raw.updated_at?raw.updated_at.split('T')[0]:todaySAST();
+    const isToday=date===todaySAST();
+
+    // Irradiation from API (if available)
+    const ir=new Array(24).fill(0);
+    const irData=raw.irradiation;
+    if(irData&&typeof irData==='object'&&!Array.isArray(irData)){
+        // Could be {hours: [{time, ghi}]} or similar
+        const irHours=irData.hours||irData.hourly||[];
+        irHours.forEach(h=>{
+            const t=h.time||'';
+            const hour=parseInt(t.split(' ')[1]?.split(':')[0]||'-1');
+            if(hour>=0&&hour<24)ir[hour]=h.ghi_w_m2||h.ghi||0;
+        });
+    }
+
+    return{...site,loaded:true,plant:site.name,last_updated:raw.updated_at||'N/A',date,
+        total_kwh:totalKwh,last_hour:lastHour,status,
+        alerts:{offline:totalKwh<=0,pace_low:false,total_low:false},
+        today:{hourly_pv:pv,irradiation:ir},hourly_pv:pv,irradiation:ir,
+        stats_30day:{hourly_avg:perf.hourly_expected||new Array(24).fill(0),
+            hourly_min:new Array(24).fill(0),hourly_max:new Array(24).fill(0),
+            hourly_p10:new Array(24).fill(0),hourly_p25:new Array(24).fill(0),
+            hourly_p75:new Array(24).fill(0),hourly_p90:new Array(24).fill(0),
+            hourly_irrad_avg:ir,daily_min:0,daily_max:0,
+            daily_avg:perf.today_expected_total||0,sample_days:0},
+        history:{}};
+}
 
 // ── Globals ─────────────────────────────────────────────────
 const HOUR_START=5,HOUR_END=21;
@@ -754,17 +847,32 @@ function togSiteGrp(name,checked){
 // Settings sync is automatic via GitHub API
 
 // ── Load ────────────────────────────────────────────────────
+let apiSitesLoaded=false;
 (async()=>{if(await checkLogin())loadAllSites()})();
 setInterval(()=>{if(currentUser)loadAllSites(true)},300000);
 
 async function loadAllSites(silent=false){
-    const promises=ALL_SITES.map(async site=>{
+    // Load VRM/Sunsynk sites from API repo (once, then cached)
+    let sites=[...ALL_SITES];
+    if(!apiSitesLoaded){
+        const apiSites=await loadAPISites();
+        // Add to ALL_SITES so groups/filters work
+        apiSites.forEach(s=>{if(!ALL_SITES.find(e=>e.name===s.name))ALL_SITES.push(s)});
+        sites=[...ALL_SITES];
+        apiSitesLoaded=true;
+    }
+
+    const promises=sites.map(async site=>{
         try{
             if(site.format==='1stavespar'){
                 const[hR,mR,hiR]=await Promise.all([fetch(site.dataUrl),fetch(site.metaUrl),fetch(site.historyUrl)]);
                 if(!hR.ok)throw 0;
                 const hist=hiR.ok?await hiR.json():null;
                 return normalize1stAve(await hR.json(),mR.ok?await mR.json():null,hist,site);
+            }
+            if(site.format==='api'){
+                const r=await fetch(site.dataUrl);if(!r.ok)throw 0;
+                return normalizeAPI(await r.json(),site);
             }
             const r=await fetch(site.dataUrl);if(!r.ok)throw 0;const d={...site,...(await r.json()),loaded:true};
                 // Override: 0 generation = offline, not OK
@@ -784,7 +892,7 @@ function getSelPlatforms(){return[...document.querySelectorAll('#platformMenu in
 function getSelGroups(){return[...document.querySelectorAll('#groupMenu input[type=checkbox]:checked')].map(c=>c.value)}
 function siteInScope(site){if(!getSelPlatforms().includes(site.platform))return false;const sg=getSelGroups();if(sg.length>0){const ag=ldGrp();if(!sg.some(g=>(ag[g]||[]).includes(site.name)))return false}return true}
 function siteVisible(site){if(!siteInScope(site))return false;if(statusFilter){const stale=isStale(site),st=site.status||'offline';const isOff=stale||st==='offline'||!site.loaded;if(statusFilter==='offline'&&!isOff)return false;if(statusFilter==='low'&&(stale||st!=='low'))return false;if(statusFilter==='ok'&&(stale||st!=='ok'))return false}return true}
-function applyFilters(){document.querySelector('#platformDrop .dropdown-toggle').classList.toggle('has-sel',getSelPlatforms().length<3);document.querySelector('#groupDrop .dropdown-toggle').classList.toggle('has-sel',getSelGroups().length>0);updateDashboard()}
+function applyFilters(){document.querySelector('#platformDrop .dropdown-toggle').classList.toggle('has-sel',getSelPlatforms().length<4);document.querySelector('#groupDrop .dropdown-toggle').classList.toggle('has-sel',getSelGroups().length>0);updateDashboard()}
 function clearAllFilters(){statusFilter=null;document.querySelectorAll('#platformMenu input').forEach(c=>c.checked=true);document.querySelectorAll('#groupMenu input[type=checkbox]').forEach(c=>c.checked=false);document.querySelector('#platformDrop .dropdown-toggle').classList.remove('has-sel');document.querySelector('#groupDrop .dropdown-toggle').classList.remove('has-sel');updateDashboard()}
 function toggleStatus(st){statusFilter=statusFilter===st?null:st;updateDashboard()}
 
@@ -907,7 +1015,7 @@ function createCard(site){
     const card=document.createElement('div');card.className='site-card';
     const cid=`c-${site.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`;
     const stale=isStale(site);
-    const pl={fusionsolar:'FusionSolar',goodwe:'GoodWe',sunsynk:'Sunsynk'}[site.platform]||'';
+    const pl={fusionsolar:'FUSIONSOLAR',goodwe:'GOODWE',sunsynk:'SUNSYNK',vrm:'VRM'}[site.platform]||site.platform.toUpperCase();
     let kwh,st,stL,dateNote='',cardPv,cardIr;
     if(viewDate){const hd=getHistDate(site,viewDate);kwh=hd?hd.total_kwh||0:0;st=kwh>0?'ok':'offline';stL=hd?'':'NO DATA';cardPv=hd?hd.hourly||new Array(24).fill(0):new Array(24).fill(0);cardIr=hd?hd.irradiation||new Array(24).fill(0):new Array(24).fill(0)}
     else{kwh=site.total_kwh||0;st=stale?'offline':(site.status||'offline');stL=stale?'STALE':st==='offline'?'OFFLINE':st==='low'?'LOW':'OK';dateNote=stale&&site.date?`<span style="color:#ef4444;font-size:0.5rem;font-weight:700;margin-left:4px">${site.date}</span>`:'';cardPv=getPv(site);cardIr=getIr(site)}
