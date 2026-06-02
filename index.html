@@ -310,6 +310,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
         <span style="color:#374151">|</span>
         <button class="ctrl-btn" id="modeToday" onclick="switchMode('today')">Bar Graph</button>
         <button class="ctrl-btn active" id="modeAvg" onclick="switchMode('average')">30-Day Average</button>
+        <button class="ctrl-btn" id="modeHourly" onclick="switchMode('hourly')" title="Auto-scaling view: zooms in early morning, expands as the day progresses">Hourly Viewer</button>
         <button class="ctrl-btn" id="bandsBtn" onclick="toggleBands()" style="font-size:0.6rem" title="Show/hide P25-P75 bands, Min, Max">Bands: ON</button>
         <button class="ctrl-btn map-btn" onclick="openMap()">🗺 Map</button>
         <span style="color:#374151">|</span>
@@ -1032,6 +1033,7 @@ function updateLegend(){
     if(currentMode==='today'){
         lb.innerHTML=`<div class="legend-item"><div class="legend-swatch" style="background:#22c55e"></div>PV Generation</div><div class="legend-item"><div class="legend-swatch" style="background:#eab308;height:0;border-top:2px dotted #eab308"></div>Today Irradiation</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(234,179,8,0.25)"></div>Avg Irradiation</div><div class="legend-item"><div class="legend-swatch" style="background:rgba(96,165,250,0.6);height:0;border-top:2px dashed rgba(96,165,250,0.6)"></div>30-Day Avg PV</div>`;
     } else {
+        // Same legend for both 'average' and 'hourly' modes
         const t=legendToggles;
         const items=[
             {key:'todayPv',  label:'Today PV',      swatch:'height:3px;background:#22c55e',                              default:true},
@@ -1072,7 +1074,7 @@ function createCard(site){
     let ip=null;const avgIr=stats.hourly_irrad_avg||[];
     if((!stale||viewDate)&&avgIr.length){const lh=viewDate?(()=>{for(let i=23;i>=0;i--)if(cardPv[i]>0)return i;return 0})():(site.last_hour||0);if(lh>=HOUR_START){const tC=cardIr.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0),aC=avgIr.slice(HOUR_START,lh+1).reduce((a,b)=>a+b,0);if(aC>=10)ip=Math.round((tC/aC)*100)}}
     const ipS=ip!==null?ip+'%':'--';
-    const cardMode=cardOverrides[cid]||currentMode;const toggleLabel=cardMode==='today'?'30D':'T';
+    const cardMode=cardOverrides[cid]||currentMode;const toggleLabel=cardMode==='today'?'30D':cardMode==='average'?'H':'T';
     // Yesterday by-hour for comparison
     let yestByHr='';
     if(!viewDate){
@@ -1083,7 +1085,7 @@ function createCard(site){
     card.onclick=(e)=>{if(!e.target.closest('.card-toggle'))window.open(site.dashboardUrl,'_blank')};return card;
 }
 
-function toggleCard(cid){const cur=cardOverrides[cid]||currentMode;cardOverrides[cid]=cur==='today'?'average':'today';const site=allSitesData.find(s=>`c-${s.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`===cid);if(site)renderChart(site);const wrap=document.getElementById(cid)?.closest('.site-chart-wrapper');if(wrap){const tb=wrap.querySelector('.card-toggle');if(tb){const m=cardOverrides[cid];tb.textContent=m==='today'?'30D':'T'}}}
+function toggleCard(cid){const cur=cardOverrides[cid]||currentMode;cardOverrides[cid]=cur==='today'?'average':cur==='average'?'hourly':'today';const site=allSitesData.find(s=>`c-${s.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()}`===cid);if(site)renderChart(site);const wrap=document.getElementById(cid)?.closest('.site-chart-wrapper');if(wrap){const tb=wrap.querySelector('.card-toggle');if(tb){const m=cardOverrides[cid];tb.textContent=m==='today'?'30D':m==='average'?'H':'T'}}}
 
 function trunc(arr){let l=0;for(let i=arr.length-1;i>=0;i--){if(arr[i]>0){l=i;break}}return arr.map((v,i)=>i<=l?v:null)}
 
@@ -1095,6 +1097,33 @@ function renderChart(site){
     let pv,ir;if(viewDate){const hd=getHistDate(site,viewDate);pv=slH(hd?hd.hourly:new Array(24).fill(0));ir=slH(hd?hd.irradiation:new Array(24).fill(0))}else{pv=slH(getPv(site));ir=slH(getIr(site))}
     const avgIr=slH(stats.hourly_irrad_avg||new Array(24).fill(0));const mode=cardOverrides[cid]||currentMode;
     if(mode==='today'){const maxIr=Math.max(...ir,...avgIr,1);siteCharts[cid]=new Chart(ctx,{type:'bar',data:{labels:CHART_LABELS,datasets:[{type:'line',data:avgIr,backgroundColor:'rgba(234,179,8,0.12)',borderColor:'rgba(234,179,8,0.25)',borderWidth:0.5,fill:true,yAxisID:'y1',pointRadius:0,tension:0.4,order:4},{type:'line',data:ir,borderColor:'#eab308',borderWidth:1.5,borderDash:[4,3],fill:false,yAxisID:'y1',pointRadius:0,tension:0.4,order:3},{type:'line',data:slH(stats.hourly_avg||new Array(24).fill(0)),borderColor:'rgba(96,165,250,0.6)',borderWidth:1,borderDash:[3,2],fill:false,pointRadius:0,tension:0.4,order:1},{type:'bar',data:pv,backgroundColor:'#22c55e',borderWidth:0,barPercentage:0.8,categoryPercentage:0.9,order:2}]},options:cOpts('y1',maxIr/0.7)})}
+    else if(mode==='hourly'){
+        // Hourly Viewer: auto-scale x-axis to current hour
+        const nowH=new Date(new Date().getTime()+(2*60-new Date().getTimezoneOffset())*60000).getHours();
+        const startH=5; // Always start from 05:00
+        const endH=Math.max(nowH+2,8); // Show at least 3 hours, end 2 hours ahead of now
+        const endIdx=Math.min(endH-startH,CHART_LABELS.length);
+        const hLabels=CHART_LABELS.slice(0,endIdx);
+        const hPv=trunc(pv).slice(0,endIdx);
+        const hAvgPv=slH(stats.hourly_avg||new Array(24).fill(0)).slice(0,endIdx);
+        const hIr=ir.slice(0,endIdx);
+        const hAvgIr=avgIr.slice(0,endIdx);
+        const t=legendToggles;
+        const maxIr=Math.max(...hIr,...hAvgIr,1);const y1Max=maxIr/0.65;
+        const ds=[];
+        if(t.avgIrr)ds.push({type:'line',data:hAvgIr,borderColor:'#f59e0b',borderWidth:1.5,borderDash:[5,3],fill:false,yAxisID:'y1',pointRadius:0,tension:0.4,order:5});
+        if(t.todayIrr)ds.push({type:'line',data:hIr,borderColor:'#f59e0b',borderWidth:2.5,fill:false,yAxisID:'y1',pointRadius:0,tension:0.4,order:4});
+        if(t.avgPv)ds.push({type:'line',data:hAvgPv,borderColor:'#22c55e',borderWidth:1.5,borderDash:[5,3],fill:false,pointRadius:0,tension:0.4,order:3});
+        if(t.todayPv)ds.push({type:'line',data:hPv,borderColor:'#22c55e',borderWidth:2.5,fill:false,pointRadius:0,tension:0.4,order:1});
+        if(t.min)ds.push({type:'line',data:slH(stats.hourly_min||new Array(24).fill(0)).slice(0,endIdx),backgroundColor:t.p25p75?'rgba(120,80,40,0.08)':'transparent',borderColor:'rgba(180,140,60,0.5)',borderWidth:0.8,fill:t.p25p75?'+1':false,pointRadius:0,tension:0.4,order:8});
+        if(t.max)ds.push({type:'line',data:slH(stats.hourly_max||new Array(24).fill(0)).slice(0,endIdx),backgroundColor:'transparent',borderColor:'rgba(150,100,220,0.5)',borderWidth:0.8,pointRadius:0,tension:0.4,order:8});
+        if(t.p25p75){
+            ds.push({type:'line',data:slH(stats.hourly_p25||new Array(24).fill(0)).slice(0,endIdx),backgroundColor:'rgba(34,197,94,0.12)',borderColor:'rgba(34,197,94,0.3)',borderWidth:0.5,fill:'+1',pointRadius:0,tension:0.4,order:7});
+            ds.push({type:'line',data:slH(stats.hourly_p75||new Array(24).fill(0)).slice(0,endIdx),backgroundColor:'transparent',borderColor:'rgba(34,197,94,0.3)',borderWidth:0.5,pointRadius:0,tension:0.4,order:7});
+        }
+        const needsY1=t.todayIrr||t.avgIrr;
+        siteCharts[cid]=new Chart(ctx,{type:'bar',data:{labels:hLabels,datasets:ds},options:cOpts(needsY1?'y1':null,needsY1?y1Max:null)});
+    }
     else{
         const t=legendToggles;
         const maxIr=Math.max(...ir,...avgIr,1);const y1Max=maxIr/0.65;
@@ -1119,7 +1148,7 @@ function renderChart(site){
     }
 }
 function cOpts(y1Id,y1Max){const o={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{color:'rgba(148,163,184,0.06)',drawBorder:false},ticks:{color:'#4b5563',font:{size:8},maxTicksLimit:8}},y:{beginAtZero:true,grid:{color:'rgba(148,163,184,0.06)',drawBorder:false},ticks:{color:'#4b5563',font:{size:8},maxTicksLimit:4}}}};if(y1Id)o.scales.y1={beginAtZero:true,position:'right',display:false,grid:{drawOnChartArea:false},max:y1Max};return o}
-function switchMode(m){currentMode=m;cardOverrides={};document.getElementById('modeToday').classList.toggle('active',m==='today');document.getElementById('modeAvg').classList.toggle('active',m==='average');document.getElementById('bandsBtn').style.display=m==='average'?'inline-block':'none';updateLegend();renderCards()}
+function switchMode(m){currentMode=m;cardOverrides={};document.getElementById('modeToday').classList.toggle('active',m==='today');document.getElementById('modeAvg').classList.toggle('active',m==='average');document.getElementById('modeHourly').classList.toggle('active',m==='hourly');document.getElementById('bandsBtn').style.display=(m==='average'||m==='hourly')?'inline-block':'none';updateLegend();renderCards()}
 function toggleBands(){
     const on=legendToggles.p25p75&&legendToggles.min&&legendToggles.max;
     legendToggles.p25p75=!on;legendToggles.min=!on;legendToggles.max=!on;
