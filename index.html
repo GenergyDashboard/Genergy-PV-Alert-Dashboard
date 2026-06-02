@@ -1100,8 +1100,8 @@ function renderChart(site){
     else if(mode==='hourly'){
         // Hourly Viewer: auto-scale x-axis to current hour
         const nowH=new Date(new Date().getTime()+(2*60-new Date().getTimezoneOffset())*60000).getHours();
-        const startH=5; // Always start from 05:00
-        const endH=Math.max(nowH+2,8); // Show at least 3 hours, end 2 hours ahead of now
+        const startH=5;
+        const endH=Math.max(nowH+1,startH+2); // Show up to current hour +1, minimum 2 hours
         const endIdx=Math.min(endH-startH,CHART_LABELS.length);
         const hLabels=CHART_LABELS.slice(0,endIdx);
         const hPv=trunc(pv).slice(0,endIdx);
