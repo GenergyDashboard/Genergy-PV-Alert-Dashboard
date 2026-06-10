@@ -1101,8 +1101,8 @@ function renderChart(site){
         // Hourly Viewer: auto-scale x-axis to current hour
         const nowH=new Date(new Date().getTime()+(2*60-new Date().getTimezoneOffset())*60000).getHours();
         const startH=5;
-        const endH=Math.max(nowH+1,startH+2); // Show up to current hour +1, minimum 2 hours
-        const endIdx=Math.min(endH-startH,CHART_LABELS.length);
+        const endH=nowH+1; // Show exactly 1 hour ahead of current time
+        const endIdx=Math.max(endH-startH,1); // At least 1 hour visible
         const hLabels=CHART_LABELS.slice(0,endIdx);
         const hPv=trunc(pv).slice(0,endIdx);
         const hAvgPv=slH(stats.hourly_avg||new Array(24).fill(0)).slice(0,endIdx);
