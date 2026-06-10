@@ -154,7 +154,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f1419;
         <div class="sub">Sign in to access fleet monitoring</div>
         <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
         <div style="position:relative">
-            <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+            <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')()">
             <button type="button" onclick="togglePassVis()" id="passToggle" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#6b7280;cursor:pointer;font-size:0.8rem;padding:4px" title="Show password">👁</button>
         </div>
         <button onclick="doLogin()">Sign In</button>
@@ -363,7 +363,6 @@ if(!MAINTENANCE){
 // ── Auth (hashed passwords — loaded from auth.json) ─────────
 let AUTH_DATA=null; // loaded from data/auth.json
 let currentUser=null;
-
 async function sha256(message){
     const msgBuffer=new TextEncoder().encode(message);
     const hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);
@@ -375,7 +374,29 @@ function togglePassVis(){
     if(inp.type==='password'){inp.type='text';btn.textContent='🔒';btn.title='Hide password'}
     else{inp.type='password';btn.textContent='👁';btn.title='Show password'}
 }
-
+async function doLogin(){
+    const u=document.getElementById('loginUser').value.trim().toLowerCase();
+    const p=document.getElementById('loginPass').value;
+    const errEl=document.getElementById('loginErr');
+    errEl.textContent='Signing in...';
+    if(!AUTH_DATA)await loadAuthData();
+    if(!AUTH_DATA){errEl.textContent='Auth system unavailable';return}
+    const userData=AUTH_DATA[u];
+    if(!userData){errEl.textContent='Invalid username or password';return}
+    const inputHash=await sha256(p);
+    if(inputHash!==userData.hash){errEl.textContent='Invalid username or password';return}
+    currentUser={username:u,role:userData.role,display:userData.display};
+    localStorage.setItem('g_session',JSON.stringify({username:u}));
+    document.getElementById('loginOverlay').style.display='none';
+    errEl.textContent='';
+    renderUserBar();
+    syncToken=await decryptSyncToken(p);
+    if(syncToken)console.log('Sync token decrypted successfully');
+    await loadSettings();
+    loadAllSites();
+}
+window.doLogin = doLogin;
+window.togglePassVis = togglePassVis;
 async function loadAuthData(){
     try{
         // Auth file sits alongside the dashboard
